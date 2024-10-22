@@ -144,6 +144,8 @@ def compute_similarity(word1, word2):
 
 def process_word(word, context, file_path=None):
     response = None  # Initialize response with None or a default value
+    suggested_word = word.content  # Default to the original word if no response
+
     # If confidence is less than 0.9, predict the word using context
     if word.confidence < 0.9:
         prompt = f"The word '{word.content}' might be incorrect. Suggest a more accurate word, considering it might be slightly distorted or misread. Only suggest if it's reasonably certain, otherwise, just return the original word. Context: {context}"
@@ -158,18 +160,25 @@ def process_word(word, context, file_path=None):
 
         # If an image is provided, you would include that in the request
         if file_path:
-          messages.append({"role": "system", "content": f"Image: {image_path}"})
+            messages.append({"role": "system", "content": f"Image: {file_path}"})
 
-          # Make the API call
-          response = openai_client.chat.completions.create(
-              model="gpt-4",  # Replace with your Azure OpenAI model deployment name
-              messages=messages,
-              temperature=0.7,
-              max_tokens=150,
-          )
+        try:
+            # Make the API call
+            response = openai_client.chat.completions.create(
+                model="gpt-4",  # Replace with your Azure OpenAI model deployment name
+                messages=messages,
+                temperature=0.7,
+                max_tokens=150,
+            )
 
-        # Extract the response
-        suggested_word = response.choices[0].message.content.strip()
+            # Ensure response is valid before attempting to access choices
+            if response and hasattr(response, "choices") and response.choices:
+                suggested_word = response.choices[0].message.content.strip()
+            else:
+                st.error("No valid response received from OpenAI API.")
+        except Exception as e:
+            st.error(f"Error in processing OpenAI request: {e}")
+            response = None  # Ensure response is handled in case of an error
 
         # Compute similarity
         similarity = compute_similarity(word.content, suggested_word)
@@ -183,6 +192,7 @@ def process_word(word, context, file_path=None):
             return word.content
     else:
         return word.content
+
 
 def analyze_layout(file_path):
     # Read the file and analyze it (similar to your original function)
