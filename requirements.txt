@@ -1,8 +1,8 @@
-azure-ai-documentintelligence==1.0.0b4
-azure-ai-textanalytics==5.0.0
-azure-ai-language==1.0.0
-python-docx==0.8.10
-openai==0.27.0
-scikit-learn==1.1.0
-sentence-transformers==2.1.0
-streamlit==1.13.0
+azure-ai-documentintelligence
+azure-ai-textanalytics
+azure-ai-language
+python-docx
+openai
+scikit-learn
+sentence-transformers
+streamlit
