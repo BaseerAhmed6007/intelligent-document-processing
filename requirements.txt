@@ -6,4 +6,4 @@ python-docx
 openai
 scikit-learn
 sentence-transformers
--U sentence-transformers
+sentence-transformers
