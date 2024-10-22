@@ -190,7 +190,7 @@ def process_word(word, context, file_path=None):
             return f"{word.content} <{suggested_word}>"  # Show original + suggested word with angle brackets
         else:
             # If the similarity is high, show the original word with strikethrough for the incorrect word
-            return f"~~{word.content}~~ {suggested_word}"  # Show original word with strikethrough + suggested word
+            return word.content  # Show original word with strikethrough + suggested word
     else:
         return word.content
 
