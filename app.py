@@ -20,6 +20,8 @@ azure_api_key = os.getenv('9e87d2057053451883dd5f5a8bbfb5ac')
 azure_endpoint = os.getenv('https://documintl.cognitiveservices.azure.com/')
 azure_openai_endpoint = os.getenv('https://basee-m2hc7i7r-australiaeast.openai.azure.com/openai/deployments/gpt-4/chat/completions?api-version=2024-08-01-preview')  # Assuming you store this
 azure_openai_key = os.getenv('735b77ae2ab344e4b23d7f3e3f256ca9')  # Assuming you store this
+st.write(f"Azure OpenAI Endpoint: {azure_openai_endpoint}")
+st.write(f"Azure OpenAI Key: {azure_openai_key}")
 text_analytics_api_key = os.getenv('38b0851c949e4743bcc696ade25b26c0')  # Assuming you store this
 text_analytics_endpoint = os.getenv('https://convundr.cognitiveservices.azure.com/')  # Assuming you store this
 convers_analysis_api_key = os.getenv('38b0851c949e4743bcc696ade25b26c0')  # Assuming you store this
