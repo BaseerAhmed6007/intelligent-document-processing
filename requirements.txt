@@ -1,9 +1,9 @@
-pip install streamlit
-pip install azure-ai-documentintelligence
-pip install azure-ai-textanalytics
-pip install azure-ai-language
-pip install python-docx
-pip install openai
-pip install scikit-learn
-pip install sentence-transformers
-pip install -U sentence-transformers
+streamlit
+azure-ai-documentintelligence
+azure-ai-textanalytics
+azure-ai-language
+python-docx
+openai
+scikit-learn
+sentence-transformers
+-U sentence-transformers
