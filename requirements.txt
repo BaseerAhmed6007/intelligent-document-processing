@@ -1,4 +1,4 @@
---upgrade
+pip install --upgrade pip
 azure-ai-documentintelligence
 azure-ai-textanalytics
 azure-ai-language
