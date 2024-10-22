@@ -186,6 +186,7 @@ def process_word(word, context, file_path=None):
 
         # Add logic based on similarity
          # If the similarity is low, show both original and suggested word
+        if similarity < 0.85:
             return f"{word.content} <{suggested_word}>"  # Show original + suggested word with angle brackets
         else:
             # If the similarity is high, show the original word with strikethrough for the incorrect word
