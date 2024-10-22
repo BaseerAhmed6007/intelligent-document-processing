@@ -1,7 +1,7 @@
 streamlit
 azure-ai-documentintelligence
 azure-ai-textanalytics
-azure-ai-language>=2024-08-01-preview
+azure-ai-language>=24.2
 python-docx
 openai
 scikit-learn
