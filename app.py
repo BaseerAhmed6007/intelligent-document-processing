@@ -265,6 +265,7 @@ def analyze_layout(file_path):
                     processed_words.append(processed_word.strip())
             processed_paragraph = " ".join(processed_words)  # Join words with a space
             doc.add_paragraph(processed_paragraph)  # Add the combined text as a paragraph
+            st.write(processed_paragraph)
                     # Assuming processed_words is your list of words
 
                     # Append the processed word to the aggregated text
