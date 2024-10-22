@@ -1,0 +1,8 @@
+azure-ai-documentintelligence
+azure-ai-textanalytics
+azure-core
+python-docx
+openai
+scikit-learn
+sentence-transformers
+streamlit
