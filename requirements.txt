@@ -1,4 +1,3 @@
-pip install --upgrade pip
 pip install streamlit
 pip install azure-ai-documentintelligence
 pip install azure-ai-textanalytics
