@@ -1,3 +1,4 @@
+--upgrade
 azure-ai-documentintelligence
 azure-ai-textanalytics
 azure-ai-language
