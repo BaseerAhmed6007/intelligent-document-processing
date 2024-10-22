@@ -2,6 +2,7 @@ streamlit
 azure-ai-documentintelligence
 azure-ai-textanalytics
 azure-ai-language-conversations
+azure-core
 python-docx
 openai
 scikit-learn
