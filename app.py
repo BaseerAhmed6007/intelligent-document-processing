@@ -44,6 +44,7 @@ def get_words(page, line):
         if _in_span(word, line.spans):
             result.append(word)
     return result
+response = None  # Initialize response
 
 # Helper function to check if a word is within any of the spans
 def _in_span(word, spans):
