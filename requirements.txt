@@ -1,7 +1,6 @@
 streamlit
 azure-ai-documentintelligence
 azure-ai-textanalytics
-azure-core-credentials
 azure-ai-language-conversations
 python-docx
 openai
