@@ -1,4 +1,4 @@
-azure-ai-documentintelligence==1.0.0
+azure-ai-documentintelligence==4.0.0
 azure-ai-textanalytics==5.0.0
 azure-ai-language==1.0.0
 python-docx==0.8.10
