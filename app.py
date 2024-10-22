@@ -143,6 +143,7 @@ def compute_similarity(word1, word2):
     return cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
 
 def process_word(word, context, file_path=None):
+    response = None  # Initialize response with None or a default value
     # If confidence is less than 0.9, predict the word using context
     if word.confidence < 0.9:
         prompt = f"The word '{word.content}' might be incorrect. Suggest a more accurate word, considering it might be slightly distorted or misread. Only suggest if it's reasonably certain, otherwise, just return the original word. Context: {context}"
