@@ -1,5 +1,6 @@
 azure-ai-documentintelligence
 azure-ai-textanalytics
+azure-ai-language
 azure-core
 python-docx
 openai
