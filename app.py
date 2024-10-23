@@ -329,14 +329,16 @@ def analyze_document_app():
             st.write("Running analysis on the uploaded file...")
 
             result_text = analyze_layout(file_path)
-            st.text_area("Analysis Output", value=result_text, height=400)
+            #st.text_area("Analysis Output", value=result_text, height=400)
 
             user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
 
             if user_command:
                 intent = recognize_intent(user_command)
                 response_message = process_intent(intent, result_text)
-                st.write(f"Command Response: {response_message}")
+                #st.write(f"Command Response: {response_message}")
+                st.text_area("Output", value=response_message, height=400)
+
 
 if __name__ == "__main__":
     analyze_document_app()
