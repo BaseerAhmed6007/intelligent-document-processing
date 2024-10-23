@@ -267,7 +267,7 @@ def analyze_layout(file_path):
 def analyze_document_app():
     response = None  # Initialize response
     st.title("Intelligent Document Processing System (IDPS)")
-    
+
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['jpg', 'png', 'pdf'])
 
     if uploaded_file is not None:
@@ -284,24 +284,27 @@ def analyze_document_app():
 
             result_text = analyze_layout(file_path)
             response_message = "No command entered."
-            #st.write(f"Result Text: {result_text}")  # Debug statement
+
             # Create two columns for side-by-side display
             col1, col2 = st.columns(2)
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
-    
-            while True:
-                user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
-                 # Check if the user wants to quit
-                if user_command.lower() == "quit":
-                    st.write("Exiting the program.")
-                    break
-                intent = recognize_intent(user_command)
-                st.write(f"Intent Text: {intent}")  # Debug statement
-                if intent:
-                    response_message = process_intent(intent, result_text)
-                    with col2:
-                        st.text_area("Output", value=response_message, height=400)
+
+            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
+
+            if user_command:
+                if user_command.strip():
+                    intent = recognize_intent(user_command)
+                    st.write(f"Intent Text: {intent}")  # Debug statement
+                    if intent:
+                        response_message = process_intent(intent, result_text)
+                        with col2:
+                            st.text_area("Output", value=response_message, height=400)
+                else:
+                    st.error("The command input cannot be empty. Please enter a valid command.")
+
+if __name__ == "__main__":
+    analyze_document_app()
 
 if __name__ == "__main__":
     analyze_document_app()
