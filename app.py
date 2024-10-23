@@ -291,20 +291,18 @@ def analyze_document_app():
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
 
-            # Remove the while loop to avoid duplicate key issue
-            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities', 'quit'):", value="summary", key="user_command_input_unique")
+            # Add radio buttons for user command selection
+            user_command = st.radio("Select a command:", options=["summary", "RedactPII", "GetEntities"], index=0, key="user_command_radio")
 
-            if user_command.strip():
-                if user_command == "quit":
-                    st.write("Quitting the command input.")
-                else:
+            if st.button('Run Command'):
+                if user_command.strip():
                     intent = recognize_intent(user_command)
                     st.write(f"Intent Text: {intent}")  # Debug statement
                     response_message = process_intent(intent, result_text)
                     with col2:
                         st.text_area("Output", value=response_message, height=400)
-            else:
-                st.error("The command input cannot be empty. Please enter a valid command.")
+                else:
+                    st.error("The command input cannot be empty. Please enter a valid command.")
 
 if __name__ == "__main__":
     analyze_document_app()
