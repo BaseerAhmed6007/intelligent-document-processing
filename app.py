@@ -293,18 +293,18 @@ def analyze_document_app():
 
             user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
 
-            if user_command:
-                if user_command.strip():
-                    intent = recognize_intent(user_command)
-                    st.write(f"Intent Text: {intent}")  # Debug statement
-                    if intent:
-                        response_message = process_intent(intent, result_text)
-                        with col2:
-                            st.text_area("Output", value=response_message, height=400)
-                else:
-                    st.error("The command input cannot be empty. Please enter a valid command.")
-            else:
-                st.error("Please enter a command to proceed.")
+            #if user_command:
+                #if user_command.strip():
+            intent = recognize_intent(user_command)
+            #st.write(f"Intent Text: {intent}")  # Debug statement
+                    #if intent:
+            response_message = process_intent(intent, result_text)
+            with col2:
+                st.text_area("Output", value=response_message, height=400)
+                #else:
+                    #st.error("The command input cannot be empty. Please enter a valid command.")
+            #else:
+                #st.error("Please enter a command to proceed.")
 
 if __name__ == "__main__":
     analyze_document_app()
