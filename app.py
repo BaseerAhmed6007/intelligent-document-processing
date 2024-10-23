@@ -343,12 +343,12 @@ def analyze_document_app():
     
             user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
     
-            #if user_command:
-            intent = recognize_intent(user_command)
-            response_message = process_intent(intent, result_text)
-            st.text_area("Output", value=response_message, height=400)
-            #st.write(f"Command Response: {response_message}")
-            #st.text_area("Output", value=response_message, height=300)
+            if user_command:
+                intent = recognize_intent(user_command)
+                response_message = process_intent(intent, result_text)
+                st.text_area("Output", value=response_message, height=400)
+                #st.write(f"Command Response: {response_message}")
+                #st.text_area("Output", value=response_message, height=300)
 
 
 if __name__ == "__main__":
