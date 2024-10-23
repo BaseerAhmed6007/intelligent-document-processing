@@ -305,6 +305,3 @@ def analyze_document_app():
 
 if __name__ == "__main__":
     analyze_document_app()
-
-if __name__ == "__main__":
-    analyze_document_app()
