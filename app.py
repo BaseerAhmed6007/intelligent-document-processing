@@ -290,8 +290,8 @@ def analyze_document_app():
             col1, col2 = st.columns(2)
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
-
-            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):", value="summary", key="user_command_input")
+            while True:
+                user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities', 'quit'):", value="summary", key="user_command_input")
 
             if user_command:
                 #if user_command.strip():
@@ -301,10 +301,10 @@ def analyze_document_app():
                 response_message = process_intent(intent, result_text)
                 with col2:
                     st.text_area("Output", value=response_message, height=400)
+            elif user_command == "quit":
+                break
             else:
                 st.error("The command input cannot be empty. Please enter a valid command.")
-        else:
-            st.error("Please enter a command to proceed.")
 
 if __name__ == "__main__":
     analyze_document_app()
