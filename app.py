@@ -88,7 +88,7 @@ def recognize_intent(user_input):
     #intents = response["result"]["prediction"]["topIntent"]
     #return intents
 
-def process_intent(intent, full_text):
+def process_intent(intent, result_text):
     if intent == "summary":
         return summarize_text(full_text)
     elif intent == "RedactPII":
