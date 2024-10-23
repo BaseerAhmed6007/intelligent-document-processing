@@ -356,9 +356,10 @@ def analyze_document_app():
             if user_command:
                 intent = recognize_intent(user_command)
                 st.write(f"Intent Text: {intent}")  # Debug statement
-                response_message = process_intent(intent, result_text)
-                st.text_area("Output", value=response_message, height=400)
-                #st.write(f"Command Response: {response_message}")
+                if intent:
+                    response_message = process_intent(intent, result_text)
+                    st.text_area("Output", value=response_message, height=400)
+                    #st.write(f"Command Response: {response_message}")
                 #st.text_area("Output", value=response_message, height=300)
 
 
