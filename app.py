@@ -264,7 +264,7 @@ def analyze_layout(file_path):
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
             processed_paragraph = " ".join(processed_words)  # Join words with a space
-            doc.add_paragraph(processed_paragraph)  # Add the combined text as a paragraph
+            #doc.add_paragraph(processed_paragraph)  # Add the combined text as a paragraph
             st.text_area("Analysis Output", value=processed_paragraph, height=400)
                     # Assuming processed_words is your list of words
 
@@ -312,8 +312,8 @@ def analyze_layout(file_path):
 
     # Aggregate the results and return
     # After processing, you can handle the aggregated text
-    full_text = " ".join(aggregated_text)
-    return full_text
+    #full_text = " ".join(aggregated_text)
+    #return full_text
 
 def analyze_document_app():
     response = None  # Initialize response
@@ -340,14 +340,14 @@ def analyze_document_app():
             #with col1:
                 #st.text_area("Analysis Output", value=result_text, height=400)
 
-            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
+        user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
 
-            if user_command:
-                intent = recognize_intent(user_command)
-                response_message = process_intent(intent, result_text)
-                st.text_area("Output", value=response_message, height=400)
-                #st.write(f"Command Response: {response_message}")
-                #st.text_area("Output", value=response_message, height=300)
+        if user_command:
+            intent = recognize_intent(user_command)
+            response_message = process_intent(intent, result_text)
+            st.text_area("Output", value=response_message, height=400)
+            #st.write(f"Command Response: {response_message}")
+            #st.text_area("Output", value=response_message, height=300)
 
 
 if __name__ == "__main__":
