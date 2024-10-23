@@ -329,7 +329,7 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
 
-            result_text = analyze_layout(file_path)
+            result_text = analyze_layout(file_path, result)
             # Create two columns
             col1, col2 = st.columns(2)
             with col1:
