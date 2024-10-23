@@ -234,7 +234,7 @@ def analyze_layout(file_path):
     aggregated_text2 = []
     if has_text:
         for page in result.pages:
-            aggregated_text.append(f"Page {page.page_number}:\n")
+            aggregated_text1.append(f"Page {page.page_number}:\n")
             page_text = []  # To hold text for the current page
             for line_idx, line in enumerate(page.lines):
                 words = get_words(page, line)
