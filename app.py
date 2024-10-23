@@ -291,7 +291,7 @@ def analyze_document_app():
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
             while True:
-                user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities', 'quit'):", value="summary", key="user_command_input")
+                user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities', 'quit'):", value="summary", key="user_command_input_loop")
 
                 if user_command.strip():
                     if user_command == "quit":
