@@ -231,8 +231,8 @@ def analyze_layout(file_path):
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
-    #aggregated_text1 = []
-    #aggregated_text2 = []
+    aggregated_text1 = []
+    aggregated_text2 = []
     if has_text:
         for page in result.pages:
             aggregated_text1.append(f"Page {page.page_number}:\n")
