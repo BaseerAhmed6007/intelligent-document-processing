@@ -317,7 +317,7 @@ def analyze_layout(file_path):
 
 def analyze_document_app():
     response = None  # Initialize response
-
+    result_text = ""
     st.title("Intelligent Document Processing System (IDPS)")
 
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['jpg', 'png', 'pdf'])
