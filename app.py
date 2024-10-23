@@ -56,9 +56,11 @@ def _in_span(word, spans):
     return False
 
 def recognize_intent(user_command):
-    # Use ConversationAnalysisClient to recognize intents
+    if not user_command or not user_command.strip():
+        raise ValueError("The input command is invalid. Please provide a non-empty command.")
+
     response = conversation_analysis_client.analyze_conversation(
-          task={
+        task={
             "kind": "Conversation",
             "analysisInput": {
                 "conversationItem": {
@@ -68,11 +70,10 @@ def recognize_intent(user_command):
                 }
             },
             "parameters": {
-                "projectName": "ConvUnder",  # Replace with your project name
-                "deploymentName": "Conversationn"  # Replace with your deployment name
+                "projectName": "ConvUnder",
+                "deploymentName": "Conversationn"
             }
         }
-
     )
 
     intents = response["result"]["prediction"]["topIntent"]
