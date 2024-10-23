@@ -290,20 +290,21 @@ def analyze_document_app():
             col1, col2 = st.columns(2)
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
-            while True:
-                user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities', 'quit'):", value="summary", key="user_command_input_loop")
 
-                if user_command.strip():
-                    if user_command == "quit":
-                        break
-                    else:
-                        intent = recognize_intent(user_command)
-                        st.write(f"Intent Text: {intent}")  # Debug statement
-                        response_message = process_intent(intent, result_text)
-                        with col2:
-                            st.text_area("Output", value=response_message, height=400)
+            # Remove the while loop to avoid duplicate key issue
+            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities', 'quit'):", value="summary", key="user_command_input_unique")
+
+            if user_command.strip():
+                if user_command == "quit":
+                    st.write("Quitting the command input.")
                 else:
-                    st.error("The command input cannot be empty. Please enter a valid command.")
+                    intent = recognize_intent(user_command)
+                    st.write(f"Intent Text: {intent}")  # Debug statement
+                    response_message = process_intent(intent, result_text)
+                    with col2:
+                        st.text_area("Output", value=response_message, height=400)
+            else:
+                st.error("The command input cannot be empty. Please enter a valid command.")
 
 if __name__ == "__main__":
     analyze_document_app()
