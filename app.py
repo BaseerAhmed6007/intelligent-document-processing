@@ -55,7 +55,7 @@ def _in_span(word, spans):
             return True
     return False
 
-def recognize_intent(user_command):
+def recognize_intent(command):
     if not user_command or not user_command.strip():
         raise ValueError("The input command is invalid. Please provide a non-empty command.")
 
@@ -65,7 +65,7 @@ def recognize_intent(user_command):
             "analysisInput": {
                 "conversationItem": {
                     "id": "1",
-                    "text": user_command,
+                    "text": command,
                     "participantId": "1"
                 }
             },
