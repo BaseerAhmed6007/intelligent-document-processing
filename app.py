@@ -296,11 +296,12 @@ def analyze_document_app():
                 if user_command.strip():
                     if user_command == "quit":
                         break
-                    intent = recognize_intent(user_command)
-                    st.write(f"Intent Text: {intent}")  # Debug statement
-                    response_message = process_intent(intent, result_text)
-                    with col2:
-                        st.text_area("Output", value=response_message, height=400)
+                    else:
+                        intent = recognize_intent(user_command)
+                        st.write(f"Intent Text: {intent}")  # Debug statement
+                        response_message = process_intent(intent, result_text)
+                        with col2:
+                            st.text_area("Output", value=response_message, height=400)
                 else:
                     st.error("The command input cannot be empty. Please enter a valid command.")
 
