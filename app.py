@@ -230,8 +230,8 @@ def analyze_layout(file_path):
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
-    aggregated_text = []
-
+    aggregated_text1 = []
+    aggregated_text2 = []
     if has_text:
         for page in result.pages:
             aggregated_text.append(f"Page {page.page_number}:\n")
@@ -249,8 +249,8 @@ def analyze_layout(file_path):
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
             processed_paragraph = " ".join(processed_words)  # Join words with a space
-            aggregated_text.append(processed_paragraph + " ")
-
+            aggregated_text1.append(processed_paragraph + " ")
+            return " ".join(aggregated_text1)  # Return the combined text as a string
     if has_tables:
         table_output = ""
         for table_idx, table in enumerate(result.tables):
@@ -265,9 +265,9 @@ def analyze_layout(file_path):
                 
                 processed_cell_content = " ".join(processed_words)
                 table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
-                aggregated_text.append(processed_cell_content + "\n")
-
-    return " ".join(aggregated_text)  # Return the combined text as a string
+                aggregated_text2.append(processed_cell_content + "\n")
+                return " ".join(aggregated_text2)  # Return the combined text as a string
+    #return " ".join(aggregated_text)  # Return the combined text as a string
     # Aggregate the results and return
     #After processing, you can handle the aggregated text
     #full_text = " ".join(aggregated_text)
