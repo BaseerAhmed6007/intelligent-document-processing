@@ -317,7 +317,6 @@ def analyze_layout(file_path):
 
 def analyze_document_app():
     response = None  # Initialize response
-    result_text = ""
     st.title("Intelligent Document Processing System (IDPS)")
 
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['jpg', 'png', 'pdf'])
@@ -334,20 +333,22 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
 
+            result_text = []
             result_text = analyze_layout(file_path)
+            
             # Create two columns
             #col1, col2 = st.columns(2)
             #with col1:
                 #st.text_area("Analysis Output", value=result_text, height=400)
-
-        user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
-
-        if user_command:
-            intent = recognize_intent(user_command)
-            response_message = process_intent(intent, result_text)
-            st.text_area("Output", value=response_message, height=400)
-            #st.write(f"Command Response: {response_message}")
-            #st.text_area("Output", value=response_message, height=300)
+    
+            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
+    
+            if user_command:
+                intent = recognize_intent(user_command)
+                response_message = process_intent(intent, result_text)
+                st.text_area("Output", value=response_message, height=400)
+                #st.write(f"Command Response: {response_message}")
+                #st.text_area("Output", value=response_message, height=300)
 
 
 if __name__ == "__main__":
