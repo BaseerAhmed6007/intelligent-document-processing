@@ -77,8 +77,16 @@ def recognize_intent(user_input):
     )
     st.write(f"Full Response: {response}")  # Debug statement to show the full response
 
-    intents = response["result"]["prediction"]["topIntent"]
-    return intents
+     # Ensure correct parsing of the response
+    if "result" in response and "prediction" in response["result"]:
+        intents = response["result"]["prediction"]["topIntent"]
+        return intents
+    else:
+        st.error("Error: Unexpected response format.")
+        return None
+        
+    #intents = response["result"]["prediction"]["topIntent"]
+    #return intents
 
 def process_intent(intent, full_text):
     if intent == "summary":
