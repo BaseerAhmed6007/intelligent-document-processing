@@ -210,20 +210,14 @@ def analyze_layout(file_path):
         data = file.read()
 
     # Call Document Intelligence API and analyze the document layout
-    # ... (Your existing code for document analysis)
-    # Initialize the Document Intelligence client
     document_intelligence_client = DocumentIntelligenceClient(
         endpoint=azure_endpoint, credential=AzureKeyCredential(azure_api_key)
     )
-
-    # Begin analyzing the document's layout
     poller = document_intelligence_client.begin_analyze_document(
         model_id="prebuilt-layout",  # Replace with correct model if necessary
         analyze_request=data,
         content_type="application/octet-stream"
     )
-
-    # Retrieve the analysis result
     result: AnalyzeResult = poller.result()
 
     # Check for handwritten content
@@ -238,87 +232,42 @@ def analyze_layout(file_path):
 
     aggregated_text = []
 
-    # Create a Word document
-    doc = Document()
-    doc.add_heading('Document Analysis Result', level=1)
-
     if has_text:
         for page in result.pages:
-            print(f"---- Analyzing layout from page #{page.page_number}----")
             aggregated_text.append(f"Page {page.page_number}:\n")
-            doc.add_heading(f'Page {page.page_number}', level=2)
-
-            # Aggregate all lines of text before processing word by word
             page_text = []  # To hold text for the current page
             for line_idx, line in enumerate(page.lines):
                 words = get_words(page, line)
                 line_text = " ".join(word.content for word in words)
-                print(f" ... Line # {line_idx} has text: '{line_text}'")
-
-                # Append line text to page_text
                 page_text.append(line_text)
-                # Add the line to the document (optional)
-                #doc.add_paragraph(line_text.strip())
 
-            # Join all lines into a single text for the current page
             aggregated_text.append("\n".join(page_text) + "\n")
             processed_words = []
-            # Now process each word for confidence checks
             for line in page.lines:
                 words = get_words(page, line)
                 for word in words:
-                    print(f" ...... Word '{word.content}' has a confidence of {word.confidence}")
-
-                    # Process the word and get the updated content, using the full context
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
             processed_paragraph = " ".join(processed_words)  # Join words with a space
-            #doc.add_paragraph(processed_paragraph)  # Add the combined text as a paragraph
-            st.text_area("Analysis Output", value=processed_paragraph, height=400)
-                    # Assuming processed_words is your list of words
+            aggregated_text.append(processed_paragraph + " ")
 
-                    # Append the processed word to the aggregated text
-            aggregated_text.append(processed_word + " ")
-            #full_text = " ".join(aggregated_text)
-            return processed_paragraph
-
-    # Process tables in the document (remains unchanged)
     if has_tables:
-        # Initialize a string to hold the processed table content
         table_output = ""
         for table_idx, table in enumerate(result.tables):
-            print(f"Table # {table_idx} has {table.row_count} rows and {table.column_count} columns")
-
-            # Add a table to the Word document
-            word_table = doc.add_table(rows=table.row_count + 1, cols=table.column_count)
-            hdr_cells = word_table.rows[0].cells
-            for i in range(table.column_count):
-                hdr_cells[i].text = f'Column {i + 1}'  # Optionally customize header
-
             for cell in table.cells:
                 cell_content = cell.content
-                print(f" ... Cell[{cell.row_index}][{cell.column_index}] has text '{cell_content}'")
-
-                # Process the cell content
                 processed_words = []
                 words = cell_content.split()  # Split the cell content into words
                 for word in words:
-                    # Create a Word object for each word
                     word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
                     processed_word = process_word(word_obj, cell_content)
                     processed_words.append(processed_word)
-
-                # Join processed words back into a string
+                
                 processed_cell_content = " ".join(processed_words)
-                # Append processed content to table_output instead of Word document
                 table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
-                #word_table.cell(cell.row_index + 1, cell.column_index).text = processed_cell_content  # Fill in the table content
-                aggregated_text.append(processed_cell_content + "\n")  # Append processed cell content
-                # After processing the entire table, display it using st.text_area
-                st.text_area("Processed Table Content", value=table_output, height=400)
-    print("=====================================================")
+                aggregated_text.append(processed_cell_content + "\n")
 
-
+    return " ".join(aggregated_text)  # Return the combined text as a string
     # Aggregate the results and return
     #After processing, you can handle the aggregated text
     #full_text = " ".join(aggregated_text)
@@ -342,27 +291,23 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
 
-            
             result_text = analyze_layout(file_path)
             response_message = "No command entered."
-            st.write(f"Result Text: {result_text}")  # Debug statement
-            # Create two columns
-            #col1, col2 = st.columns(2)
-            #with col1:
-                #st.text_area("Analysis Output", value=result_text, height=400)
+
+            # Create two columns for side-by-side display
+            col1, col2 = st.columns(2)
+            with col1:
+                st.text_area("Analysis Output", value=result_text, height=400)
     
             user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
-    
+
             if user_command:
                 intent = recognize_intent(user_command)
                 st.write(f"Intent Text: {intent}")  # Debug statement
                 if intent:
                     response_message = process_intent(intent, result_text)
-                    st.text_area("Output", value=response_message, height=400)
-                    #st.write(f"Command Response: {response_message}")
-                #st.text_area("Output", value=response_message, height=300)
-
+                    with col2:
+                        st.text_area("Output", value=response_message, height=400)
 
 if __name__ == "__main__":
     analyze_document_app()
-print("Hello, GitHub!")
