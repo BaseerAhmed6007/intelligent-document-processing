@@ -90,15 +90,15 @@ def recognize_intent(user_input):
 
 def process_intent(intent, result_text):
     if intent == "summary":
-        return summarize_text(full_text)
+        return summarize_text(result_text)
     elif intent == "RedactPII":
         # Implement your PII redaction logic here
-        return redact_pii(full_text)
+        return redact_pii(result_text)
     elif intent == "GetEntities":
         # Implement your entity extraction logic here
         print("Extracting entities...")
         # Example: return some extracted entities
-        return extract_entities(full_text)
+        return extract_entities(result_text)
     else:
         return "Sorry, I couldn't recognize the intent."
 
