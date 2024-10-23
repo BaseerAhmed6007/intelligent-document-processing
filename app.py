@@ -56,9 +56,8 @@ def _in_span(word, spans):
     return False
 
 def recognize_intent(user_command):
-
     # Use ConversationAnalysisClient to recognize intents
-    response = conversation_analysis_client.analyze_conversation(
+    response = converation_analysis_client.analyze_conversation(
           task={
             "kind": "Conversation",
             "analysisInput": {
@@ -75,18 +74,9 @@ def recognize_intent(user_command):
         }
 
     )
-    st.write(f"Full Response: {response}")  # Debug statement to show the full response
 
-     # Ensure correct parsing of the response
-    if "result" in response and "prediction" in response["result"]:
-        intents = response["result"]["prediction"]["topIntent"]
-        return intents
-    else:
-        st.error("Error: Unexpected response format.")
-        return None
-        
-    #intents = response["result"]["prediction"]["topIntent"]
-    #return intents
+    intents = response["result"]["prediction"]["topIntent"]
+    return intents
 
 def process_intent(intent, result_text):
     if intent == "summary":
