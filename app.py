@@ -290,24 +290,21 @@ def analyze_document_app():
             col1, col2 = st.columns(2)
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
-            while True:
-                user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):", value="summary", key="user_command_input")
-                # Check if the user wants to quit
-                if user_command.lower() == "quit":
-                    print("Exiting the program.")
-                    break
-            #if user_command:
-                #if user_command.strip():
-                intent = recognize_intent(user_command)
-            #st.write(f"Intent Text: {intent}")  # Debug statement
-                    #if intent:
-                response_message = process_intent(intent, result_text)
-                with col2:
-                    st.text_area("Output", value=response_message, height=400)
-                #else:
-                    #st.error("The command input cannot be empty. Please enter a valid command.")
-            #else:
-                #st.error("Please enter a command to proceed.")
+
+            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):", value="summary", key="user_command_input")
+
+            if user_command:
+                if user_command.strip():
+                    intent = recognize_intent(user_command)
+                    st.write(f"Intent Text: {intent}")  # Debug statement
+                    if intent:
+                        response_message = process_intent(intent, result_text)
+                        with col2:
+                            st.text_area("Output", value=response_message, height=400)
+                else:
+                    st.error("The command input cannot be empty. Please enter a valid command.")
+            else:
+                st.error("Please enter a command to proceed.")
 
 if __name__ == "__main__":
     analyze_document_app()
