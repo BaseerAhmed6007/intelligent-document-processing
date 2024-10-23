@@ -63,7 +63,7 @@ def recognize_intent(user_command):
             "analysisInput": {
                 "conversationItem": {
                     "id": "1",
-                    "text": user_input,
+                    "text": user_command,
                     "participantId": "1"
                 }
             },
