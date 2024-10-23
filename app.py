@@ -205,7 +205,7 @@ def process_word(word, context, file_path=None):
 
 
 def analyze_layout(file_path):
-    global aggregated_text1, aggregated_text2
+    
     # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
@@ -271,7 +271,7 @@ def analyze_layout(file_path):
     #return " ".join(aggregated_text)  # Return the combined text as a string
     # Aggregate the results and return
     #After processing, you can handle the aggregated text
-full_text = " ".join(aggregated_text1)
+    #full_text = " ".join(aggregated_text1)
     #return full_text
 
 def analyze_document_app():
