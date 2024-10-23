@@ -55,7 +55,7 @@ def _in_span(word, spans):
             return True
     return False
 
-def recognize_intent(user_input):
+def recognize_intent(user_command):
 
     # Use ConversationAnalysisClient to recognize intents
     response = conversation_analysis_client.analyze_conversation(
