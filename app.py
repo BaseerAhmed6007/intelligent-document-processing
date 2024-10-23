@@ -333,7 +333,7 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
 
-            result_text = ""
+            
             result_text = analyze_layout(file_path)
             response_message = "No command entered."
             # Create two columns
