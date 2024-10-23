@@ -33,7 +33,7 @@ text_analytics_client = TextAnalyticsClient(
     endpoint=text_analytics_endpoint,
     credential=AzureKeyCredential(text_analytics_api_key)
 )
-converation_analysis_client = ConversationAnalysisClient(
+conversation_analysis_client = ConversationAnalysisClient(
     convers_analysis_endpoint,AzureKeyCredential(convers_analysis_api_key)
 )
 
@@ -346,6 +346,7 @@ def analyze_document_app():
     
             if user_command:
                 intent = recognize_intent(user_command)
+                st.write(f"Intent Text: {intent}")  # Debug statement
                 response_message = process_intent(intent, result_text)
                 st.text_area("Output", value=response_message, height=400)
                 #st.write(f"Command Response: {response_message}")
