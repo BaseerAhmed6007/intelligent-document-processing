@@ -290,7 +290,7 @@ def analyze_document_app():
             with col1:
                 st.text_area("Analysis Output", value=result_text, height=400)
     
-            user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
+        user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
 
             if user_command:
                 intent = recognize_intent(user_command)
