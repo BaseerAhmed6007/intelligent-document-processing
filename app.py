@@ -270,10 +270,13 @@ def analyze_layout(file_path):
 
                     # Append the processed word to the aggregated text
             aggregated_text.append(processed_word + " ")
-
+            full_text = " ".join(aggregated_text)
+            return full_text
 
     # Process tables in the document (remains unchanged)
     if has_tables:
+        # Initialize a string to hold the processed table content
+        table_output = ""
         for table_idx, table in enumerate(result.tables):
             print(f"Table # {table_idx} has {table.row_count} rows and {table.column_count} columns")
 
@@ -298,16 +301,19 @@ def analyze_layout(file_path):
 
                 # Join processed words back into a string
                 processed_cell_content = " ".join(processed_words)
-                word_table.cell(cell.row_index + 1, cell.column_index).text = processed_cell_content  # Fill in the table content
+                # Append processed content to table_output instead of Word document
+                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
+                #word_table.cell(cell.row_index + 1, cell.column_index).text = processed_cell_content  # Fill in the table content
                 aggregated_text.append(processed_cell_content + "\n")  # Append processed cell content
-
+                # After processing the entire table, display it using st.text_area
+                st.text_area("Processed Table Content", value=table_output, height=400)
     print("=====================================================")
 
 
-# Aggregate the results and return
-# After processing, you can handle the aggregated text
-full_text = " ".join(aggregated_text)
-return full_text
+    # Aggregate the results and return
+    # After processing, you can handle the aggregated text
+    full_text = " ".join(aggregated_text)
+    return full_text
 
 def analyze_document_app():
     response = None  # Initialize response
@@ -330,19 +336,18 @@ def analyze_document_app():
 
             result_text = analyze_layout(file_path)
             # Create two columns
-            col1, col2 = st.columns(2)
-            with col1:
-                st.text_area("Analysis Output", value=result_text, height=400)
+            #col1, col2 = st.columns(2)
+            #with col1:
+                #st.text_area("Analysis Output", value=result_text, height=400)
 
             user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
 
             if user_command:
                 intent = recognize_intent(user_command)
                 response_message = process_intent(intent, result_text)
-                with col2:
-                    st.text_area("Output", value=response_message, height=400)
+                st.text_area("Output", value=response_message, height=400)
                 #st.write(f"Command Response: {response_message}")
-                #st.text_area("Output", value=response_message, height=400)
+                #st.text_area("Output", value=response_message, height=300)
 
 
 if __name__ == "__main__":
