@@ -294,7 +294,7 @@ def analyze_document_app():
 
             result_text = analyze_layout(file_path)
             response_message = "No command entered."
-
+            st.write(f"Result Text: {result_text}")  # Debug statement
             # Create two columns for side-by-side display
             col1, col2 = st.columns(2)
             with col1:
