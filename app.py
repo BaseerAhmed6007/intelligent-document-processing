@@ -205,6 +205,7 @@ def process_word(word, context, file_path=None):
 
 
 def analyze_layout(file_path):
+    global aggregated_text1, aggregated_text2 = []
     # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
@@ -230,8 +231,8 @@ def analyze_layout(file_path):
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
-    aggregated_text1 = []
-    aggregated_text2 = []
+    #aggregated_text1 = []
+    #aggregated_text2 = []
     if has_text:
         for page in result.pages:
             aggregated_text1.append(f"Page {page.page_number}:\n")
@@ -270,7 +271,7 @@ def analyze_layout(file_path):
     #return " ".join(aggregated_text)  # Return the combined text as a string
     # Aggregate the results and return
     #After processing, you can handle the aggregated text
-    #full_text = " ".join(aggregated_text)
+full_text = " ".join(aggregated_text1)
     #return full_text
 
 def analyze_document_app():
