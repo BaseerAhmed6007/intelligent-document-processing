@@ -270,8 +270,8 @@ def analyze_layout(file_path):
 
                     # Append the processed word to the aggregated text
             aggregated_text.append(processed_word + " ")
-            full_text = " ".join(aggregated_text)
-            return full_text
+            #full_text = " ".join(aggregated_text)
+            return processed_paragraph
 
     # Process tables in the document (remains unchanged)
     if has_tables:
@@ -333,7 +333,7 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
 
-            result_text = []
+            #result_text = []
             result_text = analyze_layout(file_path)
             
             # Create two columns
