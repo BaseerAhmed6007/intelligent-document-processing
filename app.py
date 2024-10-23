@@ -195,7 +195,7 @@ def process_word(word, context, file_path=None):
         return word.content
 
 
-def analyze_layout(file_path):
+def analyze_layout(file_path, result):
     # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
@@ -264,8 +264,9 @@ def analyze_layout(file_path):
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
             processed_paragraph = " ".join(processed_words)  # Join words with a space
+            return processed_paragraph
             doc.add_paragraph(processed_paragraph)  # Add the combined text as a paragraph
-            st.text_area("Analysis Output", value=processed_paragraph, height=400)
+            #st.text_area("Analysis Output", value=processed_paragraph, height=400)
                     # Assuming processed_words is your list of words
 
                     # Append the processed word to the aggregated text
@@ -329,15 +330,20 @@ def analyze_document_app():
             st.write("Running analysis on the uploaded file...")
 
             result_text = analyze_layout(file_path)
-            #st.text_area("Analysis Output", value=result_text, height=400)
+            # Create two columns
+            col1, col2 = st.columns(2)
+            with col1:
+                st.text_area("Analysis Output", value=result_text, height=400)
 
             user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):")
 
             if user_command:
                 intent = recognize_intent(user_command)
                 response_message = process_intent(intent, result_text)
+                with col2:
+                    st.text_area("Output", value=response_message, height=400)
                 #st.write(f"Command Response: {response_message}")
-                st.text_area("Output", value=response_message, height=400)
+                #st.text_area("Output", value=response_message, height=400)
 
 
 if __name__ == "__main__":
