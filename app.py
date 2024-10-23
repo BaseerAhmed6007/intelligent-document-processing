@@ -75,6 +75,7 @@ def recognize_intent(user_input):
         }
 
     )
+    st.write(f"Full Response: {response}")  # Debug statement to show the full response
 
     intents = response["result"]["prediction"]["topIntent"]
     return intents
