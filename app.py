@@ -241,7 +241,7 @@ def analyze_layout(file_path):
                 line_text = " ".join(word.content for word in words)
                 page_text.append(line_text)
 
-            aggregated_text1.append("\n".join(page_text) + "\n")
+            #aggregated_text1.append("\n".join(page_text) + "\n")
             processed_words = []
             for line in page.lines:
                 words = get_words(page, line)
