@@ -312,8 +312,8 @@ def analyze_layout(file_path):
 
     # Aggregate the results and return
     #After processing, you can handle the aggregated text
-    full_text = " ".join(aggregated_text)
-    return full_text
+    #full_text = " ".join(aggregated_text)
+    #return full_text
 
 def analyze_document_app():
     response = None  # Initialize response
