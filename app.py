@@ -292,7 +292,10 @@ def analyze_document_app():
                 st.text_area("Analysis Output", value=result_text, height=400)
             while True:
                 user_command = st.text_input("Enter a command (e.g., 'summary', 'RedactPII', 'GetEntities'):", value="summary", key="user_command_input")
-
+                # Check if the user wants to quit
+                if user_command.lower() == "quit":
+                    print("Exiting the program.")
+                    break
             #if user_command:
                 #if user_command.strip():
                 intent = recognize_intent(user_command)
