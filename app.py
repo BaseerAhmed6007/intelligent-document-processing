@@ -318,7 +318,7 @@ def analyze_layout(file_path):
 def analyze_document_app():
     response = None  # Initialize response
     st.title("Intelligent Document Processing System (IDPS)")
-    response_message = ""
+    
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['jpg', 'png', 'pdf'])
 
     if uploaded_file is not None:
@@ -336,6 +336,7 @@ def analyze_document_app():
             
             result_text = analyze_layout(file_path)
             response_message = "No command entered."
+            st.write(f"Result Text: {result_text}")  # Debug statement
             # Create two columns
             #col1, col2 = st.columns(2)
             #with col1:
