@@ -296,9 +296,8 @@ def analyze_document_app():
 
             if st.button('Run Command'):
                 if user_command.strip():
-                    intent = recognize_intent(user_command)
-                    st.write(f"Intent Text: {intent}")  # Debug statement
-                    response_message = process_intent(intent, result_text)
+                    # Directly process the intent based on the selected radio button
+                    response_message = process_intent(user_command, result_text)
                     with col2:
                         st.text_area("Output", value=response_message, height=400)
                 else:
