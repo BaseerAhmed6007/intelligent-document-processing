@@ -259,11 +259,6 @@ def analyze_layout(file_path):
                 table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
                 aggregated_text2.append(processed_cell_content + "\n")
                 return " ".join(aggregated_text2)  # Return the combined text as a string
-    #return " ".join(aggregated_text)  # Return the combined text as a string
-    # Aggregate the results and return
-    #After processing, you can handle the aggregated text
-    #full_text = " ".join(aggregated_text1)
-    #return full_text
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
