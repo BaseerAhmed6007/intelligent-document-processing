@@ -83,15 +83,22 @@ def process_intent(intent, text):
     if intent == "summary":
         return summarize_text(text)
     elif intent == "RedactPII":
-        # Implement your PII redaction logic here
         return redact_pii(text)
     elif intent == "GetEntities":
-        # Implement your entity extraction logic here
-        print("Extracting entities...")
-        # Example: return some extracted entities
         return extract_entities(text)
+    elif intent == "Get Corrected Version":
+        return get_corrected_text(text)  # New function to return corrected text
     else:
         return "Sorry, I couldn't recognize the intent."
+        
+def get_corrected_text(text):
+    # Regex to find words with the format: original <suggested>
+    pattern = r"\b\w+\s*<([^>]+)>"
+    
+    # Replace the original word with the suggested word inside angle brackets
+    corrected_text = re.sub(pattern, r"\1", text)
+    
+    return corrected_text
 
 def summarize_text(text):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
@@ -291,17 +298,20 @@ def analyze_document_app():
         if 'user_command' not in st.session_state:
             st.session_state['user_command'] = "summary"
 
+        # Updated to add the new option "Get Corrected Version"
         st.session_state['user_command'] = st.radio(
             "Select a command:",
-            options=["summary", "RedactPII", "GetEntities"],
-            index=["summary", "RedactPII", "GetEntities"].index(st.session_state['user_command']),
+            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],  # Added "Get Corrected Version"
+            index=["summary", "RedactPII", "GetEntities", "Get Corrected Version"].index(st.session_state['user_command']),
             key="user_command_radio"
         )
 
         if st.button('Run Command'):
             if st.session_state['user_command']:
                 response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
-                st.text_area("Command Output", value=response_message, height=400)
-
+                if st.session_state['user_command'] == "Get Corrected Version":
+                    st.text_area("Corrected Text", value=response_message, height=400)  # New output area for corrected text
+                else:
+                    st.text_area("Command Output", value=response_message, height=400)
 if __name__ == "__main__":
     analyze_document_app()
