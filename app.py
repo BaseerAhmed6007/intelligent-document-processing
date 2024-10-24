@@ -93,7 +93,7 @@ def process_intent(intent, text):
         
 def get_corrected_text(text):
     # Regex to find words with the format: original <suggested>
-    pattern = r"\b\w+\s*<([^>]+)>"
+    pattern = r"\b\w+[.,]?\s*<([^>]+)>"
     
     # Replace the original word with the suggested word inside angle brackets
     corrected_text = re.sub(pattern, r"\1", text)
