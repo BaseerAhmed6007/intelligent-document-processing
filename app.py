@@ -266,42 +266,47 @@ def analyze_layout(file_path):
     #return full_text
 
 def analyze_document_app():
-    response = None  # Initialize response
     st.title("Intelligent Document Processing System (IDPS)")
+
+    if 'file_path' not in st.session_state:
+        st.session_state['file_path'] = None
 
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['jpg', 'png', 'pdf'])
 
-    if uploaded_file is not None:
+    if uploaded_file:
         file_bytes = uploaded_file.read()
         file_path = "/tmp/uploaded_file." + uploaded_file.name.split('.')[-1]
 
         with open(file_path, 'wb') as f:
             f.write(file_bytes)
 
+        st.session_state['file_path'] = file_path
         st.success(f"File {uploaded_file.name} uploaded successfully.")
 
+    if st.session_state['file_path']:
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
+            result_text = analyze_layout(st.session_state['file_path'])
+            st.session_state['result_text'] = result_text
 
-            result_text = analyze_layout(file_path)
-            response_message = "No command entered."
+    if 'result_text' in st.session_state:
+        st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
 
-            # Create two columns for side-by-side display
-            col1, col2 = st.columns(2)
-            with col1:
-                st.text_area("Analysis Output", value=result_text, height=400)
+        # Use session state to retain the selected command
+        if 'user_command' not in st.session_state:
+            st.session_state['user_command'] = "summary"
 
-            # Add radio buttons for user command selection
-            user_command = st.radio("Select a command:", options=["summary", "RedactPII", "GetEntities"], index=0, key="user_command_radio")
+        st.session_state['user_command'] = st.radio(
+            "Select a command:",
+            options=["summary", "RedactPII", "GetEntities"],
+            index=["summary", "RedactPII", "GetEntities"].index(st.session_state['user_command']),
+            key="user_command_radio"
+        )
 
-            if st.button('Run Command'):
-                if user_command.strip():
-                    # Directly process the intent based on the selected radio button
-                    response_message = process_intent(user_command, result_text)
-                    with col2:
-                        st.text_area("Output", value=response_message, height=400)
-                else:
-                    st.error("The command input cannot be empty. Please enter a valid command.")
+        if st.button('Run Command'):
+            if st.session_state['user_command']:
+                response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
+                st.text_area("Command Output", value=response_message, height=400)
 
 if __name__ == "__main__":
     analyze_document_app()
