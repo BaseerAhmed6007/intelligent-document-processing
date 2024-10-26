@@ -1,5 +1,5 @@
-# intelligent-document-processing
-Overview
+**Intelligent Document Processing**
+**Overview**
 The app.py file is a Streamlit-based application for processing documents using various Azure AI services. It includes functionalities such as document layout analysis, text summarization, PII redaction, entity extraction, and text correction.
 
 **Libraries and Imports**
@@ -31,10 +31,13 @@ text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']
 }
-# Initialize Azure OpenAI client
+
+Initialize Azure OpenAI client
+
 openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
 
-# Initialize Azure Text Analytics client
+Initialize Azure Text Analytics client
+
 text_analytics_client = TextAnalyticsClient(
     endpoint=text_analytics_endpoint,
     credential=AzureKeyCredential(text_analytics_api_key)
