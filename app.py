@@ -1,5 +1,3 @@
-# Your code goes here
-# Your code goes here
 import streamlit as st
 import os
 from io import BytesIO  # To handle file upload
@@ -34,7 +32,7 @@ text_analytics_client = TextAnalyticsClient(
     credential=AzureKeyCredential(text_analytics_api_key)
 )
 conversation_analysis_client = ConversationAnalysisClient(
-    convers_analysis_endpoint,AzureKeyCredential(convers_analysis_api_key)
+    convers_analysis_endpoint, AzureKeyCredential(convers_analysis_api_key)
 )
 
 # Helper function to get words within a line's spans
@@ -44,7 +42,6 @@ def get_words(page, line):
         if _in_span(word, line.spans):
             result.append(word)
     return result
-response = None  # Initialize response
 
 # Helper function to check if a word is within any of the spans
 def _in_span(word, spans):
@@ -90,7 +87,7 @@ def process_intent(intent, text):
         return get_corrected_text(text)  # New function to return corrected text
     else:
         return "Sorry, I couldn't recognize the intent."
-        
+
 def get_corrected_text(text):
     # Regex to find words with the format: original <suggested>
     pattern = r"\b\w+[.,]?\s*<([^>]+)>"
@@ -201,7 +198,6 @@ def process_word(word, context, file_path=None):
     else:
         return word.content
 
-
 def analyze_layout(file_path):
     with open(file_path, 'rb') as file:
         data = file.read()
@@ -309,5 +305,6 @@ def analyze_document_app():
                     st.text_area("Corrected Text", value=response_message, height=400)
                 else:
                     st.text_area("Command Output", value=response_message, height=400)
+
 if __name__ == "__main__":
     analyze_document_app()
