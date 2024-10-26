@@ -199,9 +199,12 @@ def process_word(word, context, file_path=None):
         return word.content
 
 def analyze_layout(file_path):
+    
+    # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
 
+    # Call Document Intelligence API and analyze the document layout
     document_intelligence_client = DocumentIntelligenceClient(
         endpoint=azure_endpoint, credential=AzureKeyCredential(azure_api_key)
     )
@@ -210,53 +213,55 @@ def analyze_layout(file_path):
         analyze_request=data,
         content_type="application/octet-stream"
     )
-    result = poller.result()
+    result: AnalyzeResult = poller.result()
 
+    # Check for handwritten content
+    if result.styles and any(style.is_handwritten for style in result.styles):
+        print("Document contains handwritten content")
+    else:
+        print("Document does not contain handwritten content")
+
+    # Check if the document contains text and tables
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
+    aggregated_text1 = []
+    aggregated_text2 = []
     if has_text:
-        aggregated_text = []
         for page in result.pages:
-            aggregated_text.append(f"Page {page.page_number}:\n")
-            page_text = []
-            for line in page.lines:
+            aggregated_text1.append(f"Page {page.page_number}:\n")
+            page_text = []  # To hold text for the current page
+            for line_idx, line in enumerate(page.lines):
                 words = get_words(page, line)
                 line_text = " ".join(word.content for word in words)
                 page_text.append(line_text)
+
+            #aggregated_text1.append("\n".join(page_text) + "\n")
             processed_words = []
             for line in page.lines:
                 words = get_words(page, line)
                 for word in words:
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
-            processed_paragraph = " ".join(processed_words)
-            aggregated_text.append(processed_paragraph + " ")
-        return "\n".join(aggregated_text)
-
+            processed_paragraph = " ".join(processed_words)  # Join words with a space
+            aggregated_text1.append(processed_paragraph + " ")
+            return " ".join(aggregated_text1)  # Return the combined text as a string
     if has_tables:
-        table_html = "<table border='1'>"
-        for table in result.tables:
-            table_html += "<thead><tr>"
-            for col in range(len(table.column_headers)):
-                table_html += f"<th>Column {col + 1}</th>"
-            table_html += "</tr></thead><tbody>"
-            for row in range(len(table.rows)):
-                table_html += "<tr>"
-                for cell in table.cells:
-                    if cell.row_index == row:
-                        cell_content = cell.content
-                        processed_words = []
-                        words = cell_content.split()
-                        for word in words:
-                            word_obj = type('', (), {'content': word, 'confidence': 0.8})()
-                            processed_word = process_word(word_obj, cell_content)
-                            processed_words.append(processed_word)
-                        processed_cell_content = " ".join(processed_words)
-                        table_html += f"<td>{processed_cell_content}</td>"
-                table_html += "</tr>"
-            table_html += "</tbody></table>"
-        return table_html
+        table_output = ""
+        for table_idx, table in enumerate(result.tables):
+            for cell in table.cells:
+                cell_content = cell.content
+                processed_words = []
+                words = cell_content.split()  # Split the cell content into words
+                for word in words:
+                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
+                    processed_word = process_word(word_obj, cell_content)
+                    processed_words.append(processed_word)
+                
+                processed_cell_content = " ".join(processed_words)
+                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
+                aggregated_text2.append(processed_cell_content + "\n")
+                return " ".join(aggregated_text2)  # Return the combined text as a string
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
@@ -279,21 +284,20 @@ def analyze_document_app():
     if st.session_state['file_path']:
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
-            result = analyze_layout(st.session_state['file_path'])
-            if '<table' in result:
-                st.markdown(result, unsafe_allow_html=True)
-            else:
-                st.text_area("Analysis Output", value=result, height=400)
+            result_text = analyze_layout(st.session_state['file_path'])
+            st.session_state['result_text'] = result_text
 
     if 'result_text' in st.session_state:
         st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
 
+        # Use session state to retain the selected command
         if 'user_command' not in st.session_state:
             st.session_state['user_command'] = "summary"
 
+        # Updated to add the new option "Get Corrected Version"
         st.session_state['user_command'] = st.radio(
             "Select a command:",
-            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],
+            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],  # Added "Get Corrected Version"
             index=["summary", "RedactPII", "GetEntities", "Get Corrected Version"].index(st.session_state['user_command']),
             key="user_command_radio"
         )
@@ -302,7 +306,7 @@ def analyze_document_app():
             if st.session_state['user_command']:
                 response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
                 if st.session_state['user_command'] == "Get Corrected Version":
-                    st.text_area("Corrected Text", value=response_message, height=400)
+                    st.text_area("Corrected Text", value=response_message, height=400)  # New output area for corrected text
                 else:
                     st.text_area("Command Output", value=response_message, height=400)
 
