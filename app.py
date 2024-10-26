@@ -174,7 +174,7 @@ def process_word(word, context, file_path=None):
             response = openai_client.chat.completions.create(
                 model="gpt-4",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
-                temperature=0.9,
+                temperature=0.5,
                 max_tokens=150,
             )
 
