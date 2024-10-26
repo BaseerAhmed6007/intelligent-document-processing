@@ -290,20 +290,21 @@ def analyze_document_app():
     if st.session_state['file_path']:
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
-            result_text = analyze_layout(st.session_state['file_path'])
-            st.session_state['result_text'] = result_text
+            result = analyze_layout(st.session_state['file_path'])
+            if '<table' in result:
+                st.markdown(result, unsafe_allow_html=True)
+            else:
+                st.text_area("Analysis Output", value=result, height=400)
 
     if 'result_text' in st.session_state:
         st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
 
-        # Use session state to retain the selected command
         if 'user_command' not in st.session_state:
             st.session_state['user_command'] = "summary"
 
-        # Updated to add the new option "Get Corrected Version"
         st.session_state['user_command'] = st.radio(
             "Select a command:",
-            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],  # Added "Get Corrected Version"
+            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],
             index=["summary", "RedactPII", "GetEntities", "Get Corrected Version"].index(st.session_state['user_command']),
             key="user_command_radio"
         )
@@ -312,7 +313,7 @@ def analyze_document_app():
             if st.session_state['user_command']:
                 response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
                 if st.session_state['user_command'] == "Get Corrected Version":
-                    st.text_area("Corrected Text", value=response_message, height=400)  # New output area for corrected text
+                    st.text_area("Corrected Text", value=response_message, height=400)
                 else:
                     st.text_area("Command Output", value=response_message, height=400)
 
