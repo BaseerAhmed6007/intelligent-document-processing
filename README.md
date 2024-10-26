@@ -2,8 +2,7 @@
 **Overview**
 The app.py file is a Streamlit-based application for processing documents using various Azure AI services. It includes functionalities such as document layout analysis, text summarization, PII redaction, entity extraction, and text correction.
 
-**Libraries and Imports
-**
+**Libraries and Imports**
 {
 import streamlit as st
 import os
