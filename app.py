@@ -246,30 +246,30 @@ def analyze_layout(file_path):
             processed_paragraph = " ".join(processed_words)  # Join words with a space
             aggregated_text1.append(processed_paragraph + " ")
             return " ".join(aggregated_text1)  # Return the combined text as a string
-if has_tables:
-        table_html = "<table border='1' style='border-collapse: collapse;'>"
-        for table in result.tables:
-            table_html += "<thead><tr>"
-            for col in range(len(table.column_headers)):
-                table_html += f"<th style='border: 1px solid black;'>Column {col + 1}</th>"
-            table_html += "</tr></thead><tbody>"
-            for row in range(len(table.rows)):
-                table_html += "<tr>"
-                for cell in table.cells:
-                    if cell.row_index == row:
-                        cell_content = cell.content
-                        processed_wordss = []
-                        words = cell_content.split()
-                        for word in words:
-                            word_obj = type('', (), {'content': word, 'confidence': 0.8})()
-                            processed_word = process_word(word_obj, cell_content)
-                            processed_wordss.append(processed_word)
-
-                        processed_cell_content = " ".join(processed_wordss)
-                        table_html += f"<td style='border: 1px solid black;'>{processed_cell_content}</td>"
-                table_html += "</tr>"
-            table_html += "</tbody></table>"
-        return table_html
+    if has_tables:
+            table_html = "<table border='1' style='border-collapse: collapse;'>"
+            for table in result.tables:
+                table_html += "<thead><tr>"
+                for col in range(len(table.column_headers)):
+                    table_html += f"<th style='border: 1px solid black;'>Column {col + 1}</th>"
+                table_html += "</tr></thead><tbody>"
+                for row in range(len(table.rows)):
+                    table_html += "<tr>"
+                    for cell in table.cells:
+                        if cell.row_index == row:
+                            cell_content = cell.content
+                            processed_wordss = []
+                            words = cell_content.split()
+                            for word in words:
+                                word_obj = type('', (), {'content': word, 'confidence': 0.8})()
+                                processed_word = process_word(word_obj, cell_content)
+                                processed_wordss.append(processed_word)
+    
+                            processed_cell_content = " ".join(processed_wordss)
+                            table_html += f"<td style='border: 1px solid black;'>{processed_cell_content}</td>"
+                    table_html += "</tr>"
+                table_html += "</tbody></table>"
+            return table_html
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
