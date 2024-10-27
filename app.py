@@ -297,7 +297,7 @@ def analyze_document_app():
                 st.markdown(result_text, unsafe_allow_html=True)
             else:
                 st.text_area("Analysis Output", value=result_text, height=400)
-            #st.session_state['result_text'] = result_text
+                st.session_state['result_text'] = result_text
 
     if 'result_text' in st.session_state:
         st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
