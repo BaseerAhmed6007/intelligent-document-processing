@@ -293,7 +293,7 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
             result_text = analyze_layout(st.session_state['file_path'])
-            if '<table' in result:
+            if '<table' in result_text:
                 st.markdown(result_text, unsafe_allow_html=True)
             else:
                 st.text_area("Analysis Output", value=result_text, height=400)
