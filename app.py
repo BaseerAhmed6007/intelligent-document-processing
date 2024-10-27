@@ -247,29 +247,21 @@ def analyze_layout(file_path):
             aggregated_text1.append(processed_paragraph + " ")
             return " ".join(aggregated_text1)  # Return the combined text as a string
     if has_tables:
-            table_html = "<table border='1' style='border-collapse: collapse;'>"
-            for table in result.tables:
-                table_html += "<thead><tr>"
-                for col in range(len(table.column_headers)):
-                    table_html += f"<th style='border: 1px solid black;'>Column {col + 1}</th>"
-                table_html += "</tr></thead><tbody>"
-                for row in range(len(table.rows)):
-                    table_html += "<tr>"
-                    for cell in table.cells:
-                        if cell.row_index == row:
-                            cell_content = cell.content
-                            processed_wordss = []
-                            words = cell_content.split()
-                            for word in words:
-                                word_obj = type('', (), {'content': word, 'confidence': 0.8})()
-                                processed_word = process_word(word_obj, cell_content)
-                                processed_wordss.append(processed_word)
-    
-                            processed_cell_content = " ".join(processed_wordss)
-                            table_html += f"<td style='border: 1px solid black;'>{processed_cell_content}</td>"
-                    table_html += "</tr>"
-                table_html += "</tbody></table>"
-            return table_html
+        table_output = ""
+        for table_idx, table in enumerate(result.tables):
+            for cell in table.cells:
+                cell_content = cell.content
+                processed_words = []
+                words = cell_content.split()  # Split the cell content into words
+                for word in words:
+                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
+                    processed_word = process_word(word_obj, cell_content)
+                    processed_words.append(processed_word)
+                
+                processed_cell_content = " ".join(processed_words)
+                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
+                aggregated_text2.append(processed_cell_content + "\n")
+                return " ".join(aggregated_text2)  # Return the combined text as a string
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
@@ -293,11 +285,7 @@ def analyze_document_app():
         if st.button('Run Analysis'):
             st.write("Running analysis on the uploaded file...")
             result_text = analyze_layout(st.session_state['file_path'])
-            if '<table' in result_text:
-                st.markdown(result_text, unsafe_allow_html=True)
-            else:
-                st.text_area("Analysis Output", value=result_text, height=400)
-                st.session_state['result_text'] = result_text
+            st.session_state['result_text'] = result_text
 
     if 'result_text' in st.session_state:
         st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
