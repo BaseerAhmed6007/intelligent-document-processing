@@ -227,8 +227,6 @@ def increase_contrast(image):
     return final
     
 def analyze_layout(file_path):
-    
-    # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
         
@@ -243,64 +241,51 @@ def analyze_layout(file_path):
     _, buffer = cv2.imencode('.jpg', img)
     data = buffer.tobytes()
 
-    # Call Document Intelligence API and analyze the document layout
     document_intelligence_client = DocumentIntelligenceClient(
         endpoint=azure_endpoint, credential=AzureKeyCredential(azure_api_key)
     )
     poller = document_intelligence_client.begin_analyze_document(
-        model_id="prebuilt-layout",  # Replace with correct model if necessary
+        model_id="prebuilt-layout",
         analyze_request=data,
         content_type="application/octet-stream"
     )
-    result: AnalyzeResult = poller.result()
+    result = poller.result()
 
-    # Check for handwritten content
-    if result.styles and any(style.is_handwritten for style in result.styles):
-        print("Document contains handwritten content")
-    else:
-        print("Document does not contain handwritten content")
-
-    # Check if the document contains text and tables
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
-    aggregated_text1 = []
-    aggregated_text2 = []
+    aggregated_text = []
     if has_text:
         for page in result.pages:
-            aggregated_text1.append(f"Page {page.page_number}:\n")
-            page_text = []  # To hold text for the current page
-            for line_idx, line in enumerate(page.lines):
+            aggregated_text.append(f"Page {page.page_number}:\n")
+            page_text = []
+            for line in page.lines:
                 words = get_words(page, line)
                 line_text = " ".join(word.content for word in words)
                 page_text.append(line_text)
-
-            #aggregated_text1.append("\n".join(page_text) + "\n")
             processed_words = []
             for line in page.lines:
                 words = get_words(page, line)
                 for word in words:
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
-            processed_paragraph = " ".join(processed_words)  # Join words with a space
-            aggregated_text1.append(processed_paragraph + " ")
-            return " ".join(aggregated_text1)  # Return the combined text as a string
+            processed_paragraph = " ".join(processed_words)
+            aggregated_text.append(processed_paragraph + " ")
+
     if has_tables:
-        table_output = ""
-        for table_idx, table in enumerate(result.tables):
+        for table in result.tables:
             for cell in table.cells:
                 cell_content = cell.content
                 processed_words = []
-                words = cell_content.split()  # Split the cell content into words
+                words = cell_content.split()
                 for word in words:
-                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
+                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()
                     processed_word = process_word(word_obj, cell_content)
                     processed_words.append(processed_word)
-                
                 processed_cell_content = " ".join(processed_words)
-                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
-                aggregated_text2.append(processed_cell_content + "\n")
-                return " ".join(aggregated_text2)  # Return the combined text as a string
+                aggregated_text.append(f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n")
+
+    return " ".join(aggregated_text)
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
