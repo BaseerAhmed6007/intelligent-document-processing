@@ -205,7 +205,8 @@ def process_word(word, context, file_path=None):
         
 def deblur_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    deblurred = wiener(gray, (5, 5))
+    # Correcting the use of the Wiener filter
+    deblurred = wiener(gray, (5, 5), 1)
     return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
 def sharpen_image(image):
