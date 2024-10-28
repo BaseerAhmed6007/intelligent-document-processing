@@ -9,4 +9,5 @@ scikit-learn
 sentence-transformers
 sentence-transformers
 opencv-python-headless
+scikit-image
 
