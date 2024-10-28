@@ -13,6 +13,7 @@ import numpy as np
 import re
 import cv2
 from skimage.restoration import wiener
+from skimage import restoration
 
 # Fetch secret keys from secret storage
 azure_api_key = st.secrets['AZURE_API_KEY']
@@ -183,8 +184,8 @@ def process_word(word, context, file_path=None):
 
 def deblur_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    psf = np.ones((5, 5)) / 25
-    deblurred = wiener(gray, psf, 1)
+    psf = np.ones((5, 5)) / 25  # Adjust the PSF based on the specific blur characteristics
+    deblurred = restoration.richardson_lucy(gray, psf, iterations=30)
     return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
 def analyze_layout(file_path):
