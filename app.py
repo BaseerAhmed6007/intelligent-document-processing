@@ -11,6 +11,7 @@ from azure.ai.language.conversations import ConversationAnalysisClient
 from openai import AzureOpenAI
 import numpy as np
 import re
+import cv2
 
 # Helper functions and API clients here...
 # Fetch secret keys from secret storage
