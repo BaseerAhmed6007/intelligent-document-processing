@@ -199,43 +199,8 @@ def process_word(word, context, file_path=None):
             return word.content  
     else:
         return word.content
-        
-# Helper function to deblur image using OpenCV
-def deblur_image(image):
-    kernel_size = (5, 5)  # Increase if more deblurring is needed
-    return cv2.medianBlur(image, 5)
-
-# Helper function to sharpen image using OpenCV
-def sharpen_image(image):
-    kernel = np.array([[0, -1, 0], [-1, 5, -1], [0, -1, 0]])  # Simple sharpening kernel
-    return cv2.filter2D(image, -1, kernel)
-
-# Function to handle image preprocessing
-def preprocess_image(file_path):
-    # Load the image in grayscale
-    image = cv2.imread(file_path, cv2.IMREAD_GRAYSCALE)
-    if image is None:
-        st.error("Failed to load the image. Ensure it's a supported format.")
-        return None
-
-    # Apply deblurring and sharpening
-    deblurred_image = deblur_image(image)
-    sharpened_image = sharpen_image(deblurred_image)
-    
-    # Save the processed image temporarily
-    processed_file_path = "/tmp/processed_image.png"
-    cv2.imwrite(processed_file_path, sharpened_image)
-    
-    return processed_file_path
 
 def analyze_layout(file_path):
-    
-     # Preprocess if the file is an image
-    if file_path.endswith(('.jpg', '.png')):
-        file_path = preprocess_image(file_path)
-    
-    if not file_path:
-        return "Error processing image."
     
     # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
