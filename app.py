@@ -12,6 +12,7 @@ from openai import AzureOpenAI
 import numpy as np
 import re
 import cv2  # Add this import for OpenCV
+from skimage.restoration import wiener, richardson_lucy
 
 # Helper functions and API clients here...
 # Fetch secret keys from secret storage
@@ -202,14 +203,16 @@ def process_word(word, context, file_path=None):
     else:
         return word.content
         
-# Deblur the image using GaussianBlur and unsharp masking
 def deblur_image(image):
-    # Apply GaussianBlur to deblur the image
-    blurred = cv2.GaussianBlur(image, (5, 5), 0)
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    deblurred = wiener(gray, (5, 5))
+    return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+
+def sharpen_image(image):
+    blurred = cv2.GaussianBlur(image, (0, 0), 3)
     sharpened = cv2.addWeighted(image, 1.5, blurred, -0.5, 0)
     return sharpened
 
-# Increase the contrast of the image using CLAHE (Contrast Limited Adaptive Histogram Equalization)
 def increase_contrast(image):
     lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
     l, a, b = cv2.split(lab)
@@ -225,18 +228,14 @@ def analyze_layout(file_path):
     with open(file_path, 'rb') as file:
         data = file.read()
         
-    # Load the image using OpenCV
     nparr = np.frombuffer(data, np.uint8)
     img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-
-    # Check if the image is blurred (you can use a simple variance of Laplacian method)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     fm = cv2.Laplacian(gray, cv2.CV_64F).var()
-    if fm < 100:  # Threshold for blurriness, you may need to adjust this value
+    if fm < 100:
         img = deblur_image(img)
+        img = sharpen_image(img)
         img = increase_contrast(img)
-        
-    # Continue with the current analysis
     _, buffer = cv2.imencode('.jpg', img)
     data = buffer.tobytes()
 
