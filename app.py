@@ -185,7 +185,7 @@ def process_word(word, context, file_path=None):
 def deblur_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     psf = np.ones((5, 5)) / 25  # Adjust the PSF based on the specific blur characteristics
-    deblurred = restoration.richardson_lucy(gray, psf, iterations=30)
+    deblurred = restoration.richardson_lucy(gray, psf, num_iter=30)
     return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
 def analyze_layout(file_path):
