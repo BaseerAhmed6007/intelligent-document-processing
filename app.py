@@ -11,9 +11,6 @@ from azure.ai.language.conversations import ConversationAnalysisClient
 from openai import AzureOpenAI
 import numpy as np
 import re
-import cv2  # Add this import for OpenCV
-from skimage.restoration import wiener, richardson_lucy
-from scipy.ndimage import gaussian_filter
 
 # Helper functions and API clients here...
 # Fetch secret keys from secret storage
@@ -174,11 +171,8 @@ def process_word(word, context, file_path=None):
             response = openai_client.chat.completions.create(
                 model="gpt-4",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
-                temperature=0.45,
-                top_p=0.9,
-                max_tokens=50,
-                frequency_penalty=0.5, 
-                presence_penalty=0.5 
+                temperature=0.65,
+                max_tokens=150,
             )
 
             # Ensure response is valid before attempting to access choices
@@ -203,89 +197,71 @@ def process_word(word, context, file_path=None):
             return word.content  
     else:
         return word.content
-        
-def deblur_image(image):
-    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # Generate a point spread function (PSF) using Gaussian filter
-    psf = gaussian_filter(np.ones((5, 5)), sigma=1)
-    # Apply Wiener deconvolution with the generated PSF
-    deblurred = wiener(gray, psf, 1)
-    return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
-def sharpen_image(image):
-    blurred = cv2.GaussianBlur(image, (0, 0), 3)
-    sharpened = cv2.addWeighted(image, 1.5, blurred, -0.5, 0)
-    return sharpened
-
-def increase_contrast(image):
-    lab = cv2.cvtColor(image, cv2.COLOR_BGR2LAB)
-    l, a, b = cv2.split(lab)
-    clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8,8))
-    cl = clahe.apply(l)
-    limg = cv2.merge((cl,a,b))
-    final = cv2.cvtColor(limg, cv2.COLOR_LAB2BGR)
-    return final
-    
 def analyze_layout(file_path):
+    
+    # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
-        
-    nparr = np.frombuffer(data, np.uint8)
-    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    fm = cv2.Laplacian(gray, cv2.CV_64F).var()
-    if fm < 100:
-        img = deblur_image(img)
-        img = sharpen_image(img)
-        img = increase_contrast(img)
-    _, buffer = cv2.imencode('.jpg', img)
-    data = buffer.tobytes()
 
+    # Call Document Intelligence API and analyze the document layout
     document_intelligence_client = DocumentIntelligenceClient(
         endpoint=azure_endpoint, credential=AzureKeyCredential(azure_api_key)
     )
     poller = document_intelligence_client.begin_analyze_document(
-        model_id="prebuilt-layout",
+        model_id="prebuilt-layout",  # Replace with correct model if necessary
         analyze_request=data,
         content_type="application/octet-stream"
     )
-    result = poller.result()
+    result: AnalyzeResult = poller.result()
 
+    # Check for handwritten content
+    if result.styles and any(style.is_handwritten for style in result.styles):
+        print("Document contains handwritten content")
+    else:
+        print("Document does not contain handwritten content")
+
+    # Check if the document contains text and tables
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
-    aggregated_text = []
+    aggregated_text1 = []
+    aggregated_text2 = []
     if has_text:
         for page in result.pages:
-            aggregated_text.append(f"Page {page.page_number}:\n")
-            page_text = []
-            for line in page.lines:
+            aggregated_text1.append(f"Page {page.page_number}:\n")
+            page_text = []  # To hold text for the current page
+            for line_idx, line in enumerate(page.lines):
                 words = get_words(page, line)
                 line_text = " ".join(word.content for word in words)
                 page_text.append(line_text)
+
+            #aggregated_text1.append("\n".join(page_text) + "\n")
             processed_words = []
             for line in page.lines:
                 words = get_words(page, line)
                 for word in words:
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
-            processed_paragraph = " ".join(processed_words)
-            aggregated_text.append(processed_paragraph + " ")
-
+            processed_paragraph = " ".join(processed_words)  # Join words with a space
+            aggregated_text1.append(processed_paragraph + " ")
+            return " ".join(aggregated_text1)  # Return the combined text as a string
     if has_tables:
-        for table in result.tables:
+        table_output = ""
+        for table_idx, table in enumerate(result.tables):
             for cell in table.cells:
                 cell_content = cell.content
                 processed_words = []
-                words = cell_content.split()
+                words = cell_content.split()  # Split the cell content into words
                 for word in words:
-                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()
+                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
                     processed_word = process_word(word_obj, cell_content)
                     processed_words.append(processed_word)
+                
                 processed_cell_content = " ".join(processed_words)
-                aggregated_text.append(f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n")
-
-    return " ".join(aggregated_text)
+                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
+                aggregated_text2.append(processed_cell_content + "\n")
+                return " ".join(aggregated_text2)  # Return the combined text as a string
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
