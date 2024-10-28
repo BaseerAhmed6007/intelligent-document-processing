@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-from io import BytesIO  # To handle file upload
+from io import BytesIO
 from azure.core.credentials import AzureKeyCredential
 from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.ai.textanalytics import TextAnalyticsClient
@@ -12,17 +12,17 @@ from openai import AzureOpenAI
 import numpy as np
 import re
 import cv2
+from skimage.restoration import wiener
 
-# Helper functions and API clients here...
 # Fetch secret keys from secret storage
 azure_api_key = st.secrets['AZURE_API_KEY']
 azure_endpoint = st.secrets['AZURE_ENDPOINT']
-azure_openai_endpoint = st.secrets['AZURE_OPENAI_ENDPOINT']  # Assuming you store this
-azure_openai_key = st.secrets['AZURE_OPENAI_KEY']  # Assuming you store this
-text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']  # Assuming you store this
-text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you store this
-convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
-convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
+azure_openai_endpoint = st.secrets['AZURE_OPENAI_ENDPOINT']
+azure_openai_key = st.secrets['AZURE_OPENAI_KEY']
+text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']
+text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']
+convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']
+convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']
 
 # Initialize Azure OpenAI client
 openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
@@ -36,7 +36,6 @@ conversation_analysis_client = ConversationAnalysisClient(
     convers_analysis_endpoint, AzureKeyCredential(convers_analysis_api_key)
 )
 
-# Helper function to get words within a line's spans
 def get_words(page, line):
     result = []
     for word in page.words:
@@ -44,7 +43,6 @@ def get_words(page, line):
             result.append(word)
     return result
 
-# Helper function to check if a word is within any of the spans
 def _in_span(word, spans):
     for span in spans:
         if word.span.offset >= span.offset and (
@@ -85,17 +83,13 @@ def process_intent(intent, text):
     elif intent == "GetEntities":
         return extract_entities(text)
     elif intent == "Get Corrected Version":
-        return get_corrected_text(text)  # New function to return corrected text
+        return get_corrected_text(text)
     else:
         return "Sorry, I couldn't recognize the intent."
 
 def get_corrected_text(text):
-    # Regex to find words with the format: original <suggested>
     pattern = r"\b\w+[.,]?\s*<([^>]+)>"
-    
-    # Replace the original word with the suggested word inside angle brackets
     corrected_text = re.sub(pattern, r"\1", text)
-    
     return corrected_text
 
 def summarize_text(text):
@@ -117,12 +111,11 @@ def summarize_text(text):
     return summary
 
 def redact_pii(text):
-    # Example patterns for PII (you may need to adjust these based on your requirements)
     patterns = {
-        r'\b[A-Z][a-z]+ [A-Z][a-z]+\b': '[REDACTED NAME]',  # Names (e.g., John Doe)
-        r'\b\d{3}-\d{2}-\d{4}\b': '[REDACTED SSN]',  # Social Security Numbers
-        r'\b\w+@\w+\.\w+\b': '[REDACTED EMAIL]',  # Emails
-        r'\b\d{3}-\d{3}-\d{4}\b': '[REDACTED PHONE]',  # Phone Numbers
+        r'\b[A-Z][a-z]+ [A-Z][a-z]+\b': '[REDACTED NAME]',
+        r'\b\d{3}-\d{2}-\d{4}\b': '[REDACTED SSN]',
+        r'\b\w+@\w+\.\w+\b': '[REDACTED EMAIL]',
+        r'\b\d{3}-\d{3}-\d{4}\b': '[REDACTED PHONE]',
     }
 
     for pattern, replacement in patterns.items():
@@ -139,23 +132,19 @@ def extract_entities(text):
     else:
         return "Error in entity extraction."
 
-# Load a sentence transformer model (you can change this to another model if needed)
 model = SentenceTransformer('paraphrase-MiniLM-L6-v2')
 
-# Function to compute similarity
 def compute_similarity(word1, word2):
     embeddings = model.encode([word1, word2])
     return cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
 
 def process_word(word, context, file_path=None):
-    response = None  # Initialize response with None or a default value
-    suggested_word = word.content  # Default to the original word if no response
+    response = None
+    suggested_word = word.content
 
-    # If confidence is less than 0.9, predict the word using context
     if word.confidence < 0.9:
         prompt = f"The word '{word.content}' might be incorrect. Suggest a more accurate word, considering it might be slightly distorted or misread. Only suggest if it's reasonably certain, otherwise, just return the original word. Context: {context}"
 
-        # Prepare the request
         messages = [
             {
                 "role": "user",
@@ -163,106 +152,94 @@ def process_word(word, context, file_path=None):
             },
         ]
 
-        # If an image is provided, you would include that in the request
         if file_path:
             messages.append({"role": "system", "content": f"Image: {file_path}"})
 
         try:
-            # Make the API call
             response = openai_client.chat.completions.create(
-                model="gpt-4",  # Replace with your Azure OpenAI model deployment name
+                model="gpt-4",
                 messages=messages,
                 temperature=0.45,
                 max_tokens=100
             )
 
-            # Ensure response is valid before attempting to access choices
             if response and hasattr(response, "choices") and response.choices:
                 suggested_word = response.choices[0].message.content.strip()
             else:
                 st.error("No valid response received from OpenAI API.")
         except Exception as e:
             st.error(f"Error in processing OpenAI request: {e}")
-            response = None  # Ensure response is handled in case of an error
+            response = None
 
-        # Compute similarity
         similarity = compute_similarity(word.content, suggested_word)
         print(f" ...... Similarity between '{word.content}' and '{suggested_word}': {similarity}")
 
-        # Add logic based on similarity
-         # If the similarity is low, show both original and suggested word
         if similarity < 0.85:
-            return f"{word.content} <{suggested_word}>"  # Show original + suggested word with angle brackets
+            return f"{word.content} <{suggested_word}>"
         else:
-            # If the similarity is high, keep the original word
-            return word.content  
+            return word.content
     else:
         return word.content
 
+def deblur_image(image):
+    gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    psf = np.ones((5, 5)) / 25
+    deblurred = wiener(gray, psf, 1)
+    return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
+
 def analyze_layout(file_path):
-    
-    # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
+        
+    nparr = np.frombuffer(data, np.uint8)
+    img = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+    img = deblur_image(img)
 
-    # Call Document Intelligence API and analyze the document layout
     document_intelligence_client = DocumentIntelligenceClient(
         endpoint=azure_endpoint, credential=AzureKeyCredential(azure_api_key)
     )
     poller = document_intelligence_client.begin_analyze_document(
-        model_id="prebuilt-layout",  # Replace with correct model if necessary
+        model_id="prebuilt-layout",
         analyze_request=data,
         content_type="application/octet-stream"
     )
-    result: AnalyzeResult = poller.result()
+    result = poller.result()
 
-    # Check for handwritten content
-    if result.styles and any(style.is_handwritten for style in result.styles):
-        print("Document contains handwritten content")
-    else:
-        print("Document does not contain handwritten content")
-
-    # Check if the document contains text and tables
     has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
     has_tables = result.tables is not None and len(result.tables) > 0
 
-    aggregated_text1 = []
-    aggregated_text2 = []
+    aggregated_text = []
     if has_text:
         for page in result.pages:
-            aggregated_text1.append(f"Page {page.page_number}:\n")
-            page_text = []  # To hold text for the current page
-            for line_idx, line in enumerate(page.lines):
+            aggregated_text.append(f"Page {page.page_number}:\n")
+            page_text = []
+            for line in page.lines:
                 words = get_words(page, line)
                 line_text = " ".join(word.content for word in words)
                 page_text.append(line_text)
-
-            #aggregated_text1.append("\n".join(page_text) + "\n")
             processed_words = []
             for line in page.lines:
                 words = get_words(page, line)
                 for word in words:
                     processed_word = process_word(word, "\n".join(page_text))
                     processed_words.append(processed_word.strip())
-            processed_paragraph = " ".join(processed_words)  # Join words with a space
-            aggregated_text1.append(processed_paragraph + " ")
-            return " ".join(aggregated_text1)  # Return the combined text as a string
+            processed_paragraph = " ".join(processed_words)
+            aggregated_text.append(processed_paragraph + " ")
+
     if has_tables:
-        table_output = ""
-        for table_idx, table in enumerate(result.tables):
+        for table in result.tables:
             for cell in table.cells:
                 cell_content = cell.content
                 processed_words = []
-                words = cell_content.split()  # Split the cell content into words
+                words = cell_content.split()
                 for word in words:
-                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
+                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()
                     processed_word = process_word(word_obj, cell_content)
                     processed_words.append(processed_word)
-                
                 processed_cell_content = " ".join(processed_words)
-                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
-                aggregated_text2.append(processed_cell_content + "\n")
-                return " ".join(aggregated_text2)  # Return the combined text as a string
+                aggregated_text.append(f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n")
+
+    return " ".join(aggregated_text)
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
@@ -291,14 +268,12 @@ def analyze_document_app():
     if 'result_text' in st.session_state:
         st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
 
-        # Use session state to retain the selected command
         if 'user_command' not in st.session_state:
             st.session_state['user_command'] = "summary"
 
-        # Updated to add the new option "Get Corrected Version"
         st.session_state['user_command'] = st.radio(
             "Select a command:",
-            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],  # Added "Get Corrected Version"
+            options=["summary", "RedactPII", "GetEntities", "Get Corrected Version"],
             index=["summary", "RedactPII", "GetEntities", "Get Corrected Version"].index(st.session_state['user_command']),
             key="user_command_radio"
         )
@@ -307,7 +282,7 @@ def analyze_document_app():
             if st.session_state['user_command']:
                 response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
                 if st.session_state['user_command'] == "Get Corrected Version":
-                    st.text_area("Corrected Text", value=response_message, height=400)  # New output area for corrected text
+                    st.text_area("Corrected Text", value=response_message, height=400)
                 else:
                     st.text_area("Command Output", value=response_message, height=400)
 
