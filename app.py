@@ -13,6 +13,7 @@ import numpy as np
 import re
 import cv2  # Add this import for OpenCV
 from skimage.restoration import wiener, richardson_lucy
+from scipy.ndimage import gaussian_filter
 
 # Helper functions and API clients here...
 # Fetch secret keys from secret storage
@@ -205,8 +206,10 @@ def process_word(word, context, file_path=None):
         
 def deblur_image(image):
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    # Correcting the use of the Wiener filter
-    deblurred = wiener(gray, (5, 5), 1)
+    # Generate a point spread function (PSF) using Gaussian filter
+    psf = gaussian_filter(np.ones((5, 5)), sigma=1)
+    # Apply Wiener deconvolution with the generated PSF
+    deblurred = wiener(gray, psf, 1)
     return cv2.cvtColor(deblurred.astype(np.uint8), cv2.COLOR_GRAY2BGR)
 
 def sharpen_image(image):
