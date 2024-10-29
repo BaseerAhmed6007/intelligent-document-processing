@@ -305,11 +305,19 @@ def analyze_document_app():
 
         if st.button('Run Command'):
             if st.session_state['user_command']:
+                    response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
+                    if st.session_state['user_command'] == "Get Corrected Version":
+                        st.text_area("Corrected Text", value=response_message, height=400)  # New output area for corrected text
+                        # Update the result_text in session state with the corrected version
+                        st.session_state['result_text'] = response_message
+                    else:
+                        st.text_area("Command Output", value=response_message, height=400)
+            
+            if st.session_state['user_command'] != "Get Corrected Version" and 'result_text' in st.session_state:
+                # Perform the selected command on the corrected text if available
                 response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
-                if st.session_state['user_command'] == "Get Corrected Version":
-                    st.text_area("Corrected Text", value=response_message, height=400)  # New output area for corrected text
-                else:
-                    st.text_area("Command Output", value=response_message, height=400)
+                st.text_area("Command Output", value=response_message, height=400)
+
 
 if __name__ == "__main__":
     analyze_document_app()
