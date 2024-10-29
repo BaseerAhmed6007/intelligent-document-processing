@@ -298,7 +298,7 @@ def analyze_document_app():
         # Updated to add the new option "Get Corrected Version"
         st.session_state['user_command'] = st.radio(
             "Select a command:",
-            options=[ "Get Corrected Version", "summary", "RedactPII", "GetEntities],  # Added "Get Corrected Version"
+            options=[ "Get Corrected Version", "summary", "RedactPII", "GetEntities"],  # Added "Get Corrected Version"
             index=["Get Corrected Version", "summary", "RedactPII", "GetEntities"].index(st.session_state['user_command']),
             key="user_command_radio"
         )
