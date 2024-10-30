@@ -18,11 +18,13 @@ import cv2
 azure_api_key = st.secrets['AZURE_API_KEY']
 azure_endpoint = st.secrets['AZURE_ENDPOINT']
 azure_openai_endpoint = st.secrets['AZURE_OPENAI_ENDPOINT']  # Assuming you store this
-azure_openai_key = st.secrets['AZURE_OPENAI_KEY']  # Assuming you store this
+openai.api_key = st.secrets['AZURE_OPENAI_KEY']  # Assuming you store this
 text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']  # Assuming you store this
 text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you store this
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
+
+ 
 
 # Initialize Azure OpenAI client
 openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
@@ -101,7 +103,7 @@ def get_corrected_text(text):
 def summarize_text(text):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
-    response = openai_client.chat.completions.create(
+    response = openai.ChatCompletion.create(
         model="gpt-4",
         messages=[
             {
@@ -169,7 +171,7 @@ def process_word(word, context, file_path=None):
 
         try:
             # Make the API call
-            response = openai_client.chat.completions.create(
+            response = openai.ChatCompletion.create(
                 model="gpt-4",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
