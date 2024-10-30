@@ -13,7 +13,7 @@ import numpy as np
 #import openai
 import re
 import cv2
-from openai import ChatCompletion
+#from openai import ChatCompletion
 #from openai import OpenAI
 
 # Helper functions and API clients here...
