@@ -115,7 +115,7 @@ def summarize_text(text):
             },
         ],
         temperature=0.5,
-        max_tokens=150,
+        max_tokens=50,
     )
 
     summary = response.choices[0].message.content.strip()
@@ -178,7 +178,7 @@ def process_word(word, context, file_path=None):
                 model="gpt-4o-mini",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
-                max_tokens=100
+                max_tokens=50
             )
 
             # Ensure response is valid before attempting to access choices
