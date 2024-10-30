@@ -104,8 +104,8 @@ def get_corrected_text(text):
 def summarize_text(text):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
-    response = openai_client.chat.completions.create(
-        model="gpt-4",
+    response = openai.ChatCompletion.create(
+        model="gpt-4-turbo",
         messages=[
             {
                 "role": "user",
@@ -172,8 +172,8 @@ def process_word(word, context, file_path=None):
 
         try:
             # Make the API call
-            response = openai_client.chat.completions.create(
-                model="gpt-4o-mini",  # Replace with your Azure OpenAI model deployment name
+            response = ChatCompletion.create(
+                model="gpt-4-turbo",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
                 max_tokens=100
