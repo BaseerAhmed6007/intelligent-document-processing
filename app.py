@@ -13,6 +13,7 @@ import numpy as np
 import openai
 import re
 import cv2
+from openai import ChatCompletion
 
 # Helper functions and API clients here...
 # Fetch secret keys from secret storage
