@@ -10,4 +10,5 @@ sentence-transformers
 sentence-transformers
 opencv-python-headless
 scikit-image
+--upgrade openai
 
