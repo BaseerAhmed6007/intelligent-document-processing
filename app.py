@@ -8,13 +8,10 @@ from docx import Document
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 from azure.ai.language.conversations import ConversationAnalysisClient
-#from openai import AzureOpenAI
+from openai import AzureOpenAI
 import numpy as np
-import openai
 import re
 import cv2
-#from openai import ChatCompletion
-#from openai import OpenAI
 
 # Helper functions and API clients here...
 # Fetch secret keys from secret storage
@@ -26,11 +23,9 @@ text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']  # Assuming you st
 text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you store this
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
-# Set OpenAI API key globally
-openai.api_key = azure_openai_key
 
 # Initialize Azure OpenAI client
-#openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-07-18")
+openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
 
 # Initialize Azure Text Analytics client
 text_analytics_client = TextAnalyticsClient(
@@ -97,17 +92,17 @@ def process_intent(intent, text):
 def get_corrected_text(text):
     # Regex to find words with the format: original <suggested>
     pattern = r"\b\w+[.,]?\s*<([^>]+)>"
-    
+
     # Replace the original word with the suggested word inside angle brackets
     corrected_text = re.sub(pattern, r"\1", text)
-    
+
     return corrected_text
 
 def summarize_text(text):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
-    response = openai.Completion.create(
-        model="gpt-4o-mini",
+    response = openai_client.chat.completions.create(
+        model="gpt-4",
         messages=[
             {
                 "role": "user",
@@ -115,7 +110,7 @@ def summarize_text(text):
             },
         ],
         temperature=0.5,
-        max_tokens=50,
+        max_tokens=150,
     )
 
     summary = response.choices[0].message.content.strip()
@@ -174,11 +169,11 @@ def process_word(word, context, file_path=None):
 
         try:
             # Make the API call
-            response = openai.Completion.create(
-                model="gpt-4o-mini",  # Replace with your Azure OpenAI model deployment name
+            response = openai_client.chat.completions.create(
+                model="gpt-4",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
-                max_tokens=50
+                max_tokens=100
             )
 
             # Ensure response is valid before attempting to access choices
@@ -200,12 +195,12 @@ def process_word(word, context, file_path=None):
             return f"{word.content} <{suggested_word}>"  # Show original + suggested word with angle brackets
         else:
             # If the similarity is high, keep the original word
-            return word.content  
+            return word.content
     else:
         return word.content
 
 def analyze_layout(file_path):
-    
+
     # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
         data = file.read()
@@ -263,7 +258,7 @@ def analyze_layout(file_path):
                     word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
                     processed_word = process_word(word_obj, cell_content)
                     processed_words.append(processed_word)
-                
+
                 processed_cell_content = " ".join(processed_words)
                 table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
                 aggregated_text2.append(processed_cell_content + "\n")
@@ -317,7 +312,7 @@ def analyze_document_app():
                         st.session_state['result_text'] = response_message
                     else:
                         st.text_area("Command Output", value=response_message, height=400, key="command_output")
-            
+
             if st.session_state['user_command'] != "Get Corrected Version" and 'result_text' in st.session_state:
                 # Perform the selected command on the corrected text if available
                 response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
