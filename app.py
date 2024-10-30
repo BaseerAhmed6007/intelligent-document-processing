@@ -25,7 +25,7 @@ text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you 
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
 # Set OpenAI API key globally
-#openai.api_key = openai_api_key
+openai.api_key = azure_openai_key
 
 # Initialize Azure OpenAI client
 #openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-07-18")
