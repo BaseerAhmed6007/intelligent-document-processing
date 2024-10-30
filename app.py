@@ -29,7 +29,7 @@ convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assu
  
 
 # Initialize Azure OpenAI client
-openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
+#openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
 
 # Initialize Azure Text Analytics client
 text_analytics_client = TextAnalyticsClient(
