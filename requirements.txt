@@ -4,7 +4,7 @@ azure-ai-textanalytics
 azure-ai-language-conversations
 azure-core
 python-docx
-openai==0.11.6
+openai>=0.11.6
 scikit-learn
 sentence-transformers
 sentence-transformers
