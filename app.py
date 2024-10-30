@@ -25,7 +25,7 @@ convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assumi
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
 
 # Initialize Azure OpenAI client
-openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="turbo-2024-04-09")
+openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2023-03-15-preview")
 
 # Initialize Azure Text Analytics client
 text_analytics_client = TextAnalyticsClient(
@@ -170,7 +170,7 @@ def process_word(word, context, file_path=None):
         try:
             # Make the API call
             response = openai_client.chat.completions.create(
-                model="gpt-4",  # Replace with your Azure OpenAI model deployment name
+                model="gpt-4-turbo",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
                 max_tokens=100
