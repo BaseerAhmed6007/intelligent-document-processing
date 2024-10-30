@@ -10,7 +10,7 @@ from sentence_transformers import SentenceTransformer
 from azure.ai.language.conversations import ConversationAnalysisClient
 #from openai import AzureOpenAI
 import numpy as np
-#import openai
+import openai
 import re
 import cv2
 #from openai import ChatCompletion
