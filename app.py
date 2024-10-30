@@ -10,6 +10,7 @@ from sentence_transformers import SentenceTransformer
 from azure.ai.language.conversations import ConversationAnalysisClient
 from openai import AzureOpenAI
 import numpy as np
+import openai
 import re
 import cv2
 
@@ -23,9 +24,11 @@ text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']  # Assuming you st
 text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you store this
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
+# Set OpenAI API key globally
+openai.api_key = openai_api_key
 
 # Initialize Azure OpenAI client
-openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-07-18")
+#openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-07-18")
 
 # Initialize Azure Text Analytics client
 text_analytics_client = TextAnalyticsClient(
