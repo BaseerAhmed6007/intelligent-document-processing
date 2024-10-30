@@ -8,7 +8,8 @@ from docx import Document
 from sklearn.metrics.pairwise import cosine_similarity
 from sentence_transformers import SentenceTransformer
 from azure.ai.language.conversations import ConversationAnalysisClient
-from openai import AzureOpenAI
+#from openai import AzureOpenAI
+import openai
 import numpy as np
 import re
 import cv2
