@@ -144,7 +144,7 @@ def compute_similarity(word1, word2):
     embeddings = model.encode([word1, word2])
     return cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
 
-def process_word(word, context, file_path=None):
+def process_word(word, context, file_path=None, openai_client):
     response = None  # Initialize response with None or a default value
     suggested_word = word.content  # Default to the original word if no response
 
@@ -196,7 +196,7 @@ def process_word(word, context, file_path=None):
     else:
         return word.content
 
-def analyze_layout(file_path):
+def analyze_layout(file_path, openai_client):
 
     # Read the file and analyze it (similar to your original function)
     with open(file_path, 'rb') as file:
@@ -288,7 +288,7 @@ def analyze_document_app():
             # Initialize Azure OpenAI client with user-provided credentials
             openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
             st.write("Running analysis on the uploaded file...")
-            result_text = analyze_layout(st.session_state['file_path'])
+            result_text = analyze_layout(st.session_state['file_path'], openai_client)
             st.session_state['result_text'] = result_text
 
     if 'result_text' in st.session_state:
