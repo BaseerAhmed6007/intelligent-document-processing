@@ -170,7 +170,7 @@ def process_word(word, context, openai_client, file_path=None):
                 model="gpt-4o",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
-                max_tokens=10
+                max_tokens=800
             )
 
             # Ensure response is valid before attempting to access choices
