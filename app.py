@@ -17,15 +17,12 @@ import cv2
 # Fetch secret keys from secret storage
 azure_api_key = st.secrets['AZURE_API_KEY']
 azure_endpoint = st.secrets['AZURE_ENDPOINT']
-#azure_openai_endpoint = st.secrets['AZURE_OPENAI_ENDPOINT']  # Assuming you store this
-#azure_openai_key = st.secrets['AZURE_OPENAI_KEY']  # Assuming you store this
+# azure_openai_endpoint = st.secrets['AZURE_OPENAI_ENDPOINT']  # Assuming you store this
+# azure_openai_key = st.secrets['AZURE_OPENAI_KEY']  # Assuming you store this
 text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']  # Assuming you store this
 text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you store this
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
 convers_analysis_endpoint = st.secrets['CONVERSATION_ANALYSIS_ENDPOINT']  # Assuming you store this
-
-# Initialize Azure OpenAI client
-#openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
 
 # Initialize Azure Text Analytics client
 text_analytics_client = TextAnalyticsClient(
@@ -269,11 +266,11 @@ def analyze_document_app():
 
     if 'file_path' not in st.session_state:
         st.session_state['file_path'] = None
-        
-    #Input fields for Azure OpenAI credentials
+
+    # Input fields for Azure OpenAI credentials
     azure_openai_key = st.text_input("Azure OpenAI Key", type="password")
     azure_openai_endpoint = st.text_input("Azure OpenAI Endpoint")
-    
+
     uploaded_file = st.file_uploader("Upload a file for analysis", type=['jpg', 'png', 'pdf'])
 
     if uploaded_file:
@@ -291,7 +288,7 @@ def analyze_document_app():
             # Initialize Azure OpenAI client with user-provided credentials
             openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
             st.write("Running analysis on the uploaded file...")
-            result_text = analyze_layout(st.session_state['file_path'])re_openai_key and azure_openai_endpoint:
+            result_text = analyze_layout(st.session_state['file_path'], openai_client)
             st.session_state['result_text'] = result_text
 
     if 'result_text' in st.session_state:
@@ -304,24 +301,24 @@ def analyze_document_app():
         # Updated to add the new option "Get Corrected Version"
         st.session_state['user_command'] = st.radio(
             "Select a command:",
-            options=[ "Get Corrected Version", "summary", "RedactPII", "GetEntities"],  # Added "Get Corrected Version"
+            options=["Get Corrected Version", "summary", "RedactPII", "GetEntities"],  # Added "Get Corrected Version"
             index=["Get Corrected Version", "summary", "RedactPII", "GetEntities"].index(st.session_state['user_command']),
             key="user_command_radio"
         )
 
         if st.button('Run Command'):
             if st.session_state['user_command']:
-                    response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
-                    if st.session_state['user_command'] == "Get Corrected Version":
-                        st.text_area("Corrected Text", value=response_message, height=400, key="corrected_text")  # New output area for corrected text
-                        # Update the result_text in session state with the corrected version
-                        st.session_state['result_text'] = response_message
-                    else:
-                        st.text_area("Command Output", value=response_message, height=400, key="command_output")
+                response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'], openai_client)
+                if st.session_state['user_command'] == "Get Corrected Version":
+                    st.text_area("Corrected Text", value=response_message, height=400, key="corrected_text")  # New output area for corrected text
+                    # Update the result_text in session state with the corrected version
+                    st.session_state['result_text'] = response_message
+                else:
+                    st.text_area("Command Output", value=response_message, height=400, key="command_output")
 
             if st.session_state['user_command'] != "Get Corrected Version" and 'result_text' in st.session_state:
                 # Perform the selected command on the corrected text if available
-                response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'])
+                response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'], openai_client)
                 st.text_area("Command Output", value=response_message, height=400, key="command_output_final")
 
 
