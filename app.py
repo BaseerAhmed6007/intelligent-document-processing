@@ -286,7 +286,7 @@ def analyze_document_app():
     if st.session_state['file_path'] and azure_openai_key and azure_openai_endpoint:
         if st.button('Run Analysis'):
             # Initialize Azure OpenAI client with user-provided credentials
-            openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-02-15-preview")
+            openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
             st.write("Running analysis on the uploaded file...")
             result_text = analyze_layout(st.session_state['file_path'], openai_client)
             st.session_state['result_text'] = result_text
