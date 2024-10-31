@@ -99,7 +99,7 @@ def summarize_text(text, openai_client):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
     response = openai_client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o-mini",
         messages=[
             {
                 "role": "user",
@@ -167,7 +167,7 @@ def process_word(word, context, openai_client, file_path=None):
         try:
             # Make the API call
             response = openai_client.chat.completions.create(
-                model="gpt-4",  # Replace with your Azure OpenAI model deployment name
+                model="gpt-4o-mini",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
                 max_tokens=100
@@ -286,7 +286,7 @@ def analyze_document_app():
     if st.session_state['file_path'] and azure_openai_key and azure_openai_endpoint:
         if st.button('Run Analysis'):
             # Initialize Azure OpenAI client with user-provided credentials
-            openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
+            openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-02-15-preview")
             st.write("Running analysis on the uploaded file...")
             result_text = analyze_layout(st.session_state['file_path'], openai_client)
             st.session_state['result_text'] = result_text
