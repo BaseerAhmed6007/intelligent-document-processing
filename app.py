@@ -239,7 +239,7 @@ def analyze_layout(file_path, openai_client):
             for line in page.lines:
                 words = get_words(page, line)
                 for word in words:
-                    processed_word = process_word(word, "\n".join(page_text))
+                    processed_word = process_word(word, "\n".join(page_text), openai_client)
                     processed_words.append(processed_word.strip())
             processed_paragraph = " ".join(processed_words)  # Join words with a space
             aggregated_text1.append(processed_paragraph + " ")
@@ -253,7 +253,7 @@ def analyze_layout(file_path, openai_client):
                 words = cell_content.split()  # Split the cell content into words
                 for word in words:
                     word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
-                    processed_word = process_word(word_obj, cell_content)
+                    processed_word = process_word(word_obj, cell_content, openai_client)
                     processed_words.append(processed_word)
 
                 processed_cell_content = " ".join(processed_words)
