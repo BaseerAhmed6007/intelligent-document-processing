@@ -74,9 +74,9 @@ def recognize_intent(user_command):
     intents = response["result"]["prediction"]["topIntent"]
     return intents
 
-def process_intent(intent, text):
+def process_intent(intent, text, openai_client):
     if intent == "summary":
-        return summarize_text(text)
+        return summarize_text(text, openai_client)
     elif intent == "RedactPII":
         return redact_pii(text)
     elif intent == "GetEntities":
@@ -95,7 +95,7 @@ def get_corrected_text(text):
 
     return corrected_text
 
-def summarize_text(text):
+def summarize_text(text, openai_client):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
     response = openai_client.chat.completions.create(
