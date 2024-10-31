@@ -270,7 +270,7 @@ def analyze_document_app():
     if 'file_path' not in st.session_state:
         st.session_state['file_path'] = None
         
-    Input fields for Azure OpenAI credentials
+    #Input fields for Azure OpenAI credentials
     azure_openai_key = st.text_input("Azure OpenAI Key", type="password")
     azure_openai_endpoint = st.text_input("Azure OpenAI Endpoint")
     
@@ -286,7 +286,7 @@ def analyze_document_app():
         st.session_state['file_path'] = file_path
         st.success(f"File {uploaded_file.name} uploaded successfully.")
 
-    if st.session_state['file_path'] and azure_openai_key and azure_openai_endpoint::
+    if st.session_state['file_path'] and azure_openai_key and azure_openai_endpoint:
         if st.button('Run Analysis'):
             # Initialize Azure OpenAI client with user-provided credentials
             openai_client = AzureOpenAI(azure_endpoint=azure_openai_endpoint, api_key=azure_openai_key, api_version="2024-08-01-preview")
