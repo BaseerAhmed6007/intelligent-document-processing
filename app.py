@@ -144,7 +144,7 @@ def compute_similarity(word1, word2):
     embeddings = model.encode([word1, word2])
     return cosine_similarity([embeddings[0]], [embeddings[1]])[0][0]
 
-def process_word(word, context, file_path=None, openai_client):
+def process_word(word, context, openai_client, file_path=None):
     response = None  # Initialize response with None or a default value
     suggested_word = word.content  # Default to the original word if no response
 
