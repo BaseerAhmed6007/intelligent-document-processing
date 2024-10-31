@@ -290,6 +290,7 @@ def analyze_document_app():
             st.write("Running analysis on the uploaded file...")
             result_text = analyze_layout(st.session_state['file_path'], openai_client)
             st.session_state['result_text'] = result_text
+            st.session_state['openai_client'] = openai_client  # Save the client in session state
 
     if 'result_text' in st.session_state:
         st.text_area("Analysis Output", value=st.session_state['result_text'], height=400)
@@ -308,13 +309,17 @@ def analyze_document_app():
 
         if st.button('Run Command'):
             if st.session_state['user_command']:
-                response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'], openai_client)
-                if st.session_state['user_command'] == "Get Corrected Version":
-                    st.text_area("Corrected Text", value=response_message, height=400, key="corrected_text")  # New output area for corrected text
-                    # Update the result_text in session state with the corrected version
-                    st.session_state['result_text'] = response_message
+                openai_client = st.session_state.get('openai_client')  # Retrieve the client from session state
+                if openai_client:
+                    response_message = process_intent(st.session_state['user_command'], st.session_state['result_text'], openai_client)
+                    if st.session_state['user_command'] == "Get Corrected Version":
+                        st.text_area("Corrected Text", value=response_message, height=400, key="corrected_text")  # New output area for corrected text
+                        # Update the result_text in session state with the corrected version
+                        st.session_state['result_text'] = response_message
+                    else:
+                        st.text_area("Command Output", value=response_message, height=400, key="command_output")
                 else:
-                    st.text_area("Command Output", value=response_message, height=400, key="command_output")
+                    st.error("OpenAI client is not initialized. Please run analysis first.")
 
             if st.session_state['user_command'] != "Get Corrected Version" and 'result_text' in st.session_state:
                 # Perform the selected command on the corrected text if available
