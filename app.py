@@ -2,7 +2,6 @@ import streamlit as st
 import os
 from io import BytesIO  # To handle file upload
 from azure.core.credentials import AzureKeyCredential
-from azure.ai.documentintelligence import DocumentIntelligenceClient
 from azure.ai.textanalytics import TextAnalyticsClient
 from docx import Document
 from sklearn.metrics.pairwise import cosine_similarity
@@ -17,8 +16,6 @@ import cv2
 # Fetch secret keys from secret storage
 azure_api_key = st.secrets['AZURE_API_KEY']
 azure_endpoint = st.secrets['AZURE_ENDPOINT']
-# azure_openai_endpoint = st.secrets['AZURE_OPENAI_ENDPOINT']  # Assuming you store this
-# azure_openai_key = st.secrets['AZURE_OPENAI_KEY']  # Assuming you store this
 text_analytics_api_key = st.secrets['TEXT_ANALYTICS_API_KEY']  # Assuming you store this
 text_analytics_endpoint = st.secrets['TEXT_ANALYTICS_ENDPOINT']  # Assuming you store this
 convers_analysis_api_key = st.secrets['CONVERSATION_ANALYSIS_API_KEY']  # Assuming you store this
@@ -32,23 +29,6 @@ text_analytics_client = TextAnalyticsClient(
 conversation_analysis_client = ConversationAnalysisClient(
     convers_analysis_endpoint, AzureKeyCredential(convers_analysis_api_key)
 )
-
-# Helper function to get words within a line's spans
-def get_words(page, line):
-    result = []
-    for word in page.words:
-        if _in_span(word, line.spans):
-            result.append(word)
-    return result
-
-# Helper function to check if a word is within any of the spans
-def _in_span(word, spans):
-    for span in spans:
-        if word.span.offset >= span.offset and (
-            word.span.offset + word.span.length
-        ) <= (span.offset + span.length):
-            return True
-    return False
 
 def recognize_intent(user_command):
     if not user_command or not user_command.strip():
@@ -99,7 +79,7 @@ def summarize_text(text, openai_client):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
     response = openai_client.chat.completions.create(
-        model="gpt-4",
+        model="gpt-4o",
         messages=[
             {
                 "role": "user",
@@ -197,69 +177,38 @@ def process_word(word, context, openai_client, file_path=None):
         return word.content
 
 def analyze_layout(file_path, openai_client):
-
-    # Read the file and analyze it (similar to your original function)
+    # Read the file and convert it to text using GPT-4o
     with open(file_path, 'rb') as file:
-        data = file.read()
+        file_bytes = file.read()
 
-    # Call Document Intelligence API and analyze the document layout
-    document_intelligence_client = DocumentIntelligenceClient(
-        endpoint=azure_endpoint, credential=AzureKeyCredential(azure_api_key)
+    # Convert image bytes to text using GPT-4o
+    response = openai_client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {
+                "role": "system",
+                "content": "You are a helpful assistant that converts images to text."
+            },
+            {
+                "role": "user",
+                "content": f"Convert the following image to text:\n\n{file_bytes}"
+            },
+        ],
+        temperature=0.5,
+        max_tokens=2000,
     )
-    poller = document_intelligence_client.begin_analyze_document(
-        model_id="prebuilt-layout",  # Replace with correct model if necessary
-        analyze_request=data,
-        content_type="application/octet-stream"
-    )
-    result: AnalyzeResult = poller.result()
 
-    # Check for handwritten content
-    if result.styles and any(style.is_handwritten for style in result.styles):
-        print("Document contains handwritten content")
+    if response and hasattr(response, "choices") and response.choices:
+        text = response.choices[0].message.content.strip()
     else:
-        print("Document does not contain handwritten content")
+        st.error("No valid response received from OpenAI API.")
+        return ""
 
-    # Check if the document contains text and tables
-    has_text = len(result.pages) > 0 and any(len(page.lines) > 0 for page in result.pages)
-    has_tables = result.tables is not None and len(result.tables) > 0
+    # Process text to extract words and check confidence
+    words = text.split()
+    processed_words = [process_word({'content': word, 'confidence': 0.8}, text, openai_client) for word in words]
 
-    aggregated_text1 = []
-    aggregated_text2 = []
-    if has_text:
-        for page in result.pages:
-            aggregated_text1.append(f"Page {page.page_number}:\n")
-            page_text = []  # To hold text for the current page
-            for line_idx, line in enumerate(page.lines):
-                words = get_words(page, line)
-                line_text = " ".join(word.content for word in words)
-                page_text.append(line_text)
-
-            #aggregated_text1.append("\n".join(page_text) + "\n")
-            processed_words = []
-            for line in page.lines:
-                words = get_words(page, line)
-                for word in words:
-                    processed_word = process_word(word, "\n".join(page_text), openai_client)
-                    processed_words.append(processed_word.strip())
-            processed_paragraph = " ".join(processed_words)  # Join words with a space
-            aggregated_text1.append(processed_paragraph + " ")
-            return " ".join(aggregated_text1)  # Return the combined text as a string
-    if has_tables:
-        table_output = ""
-        for table_idx, table in enumerate(result.tables):
-            for cell in table.cells:
-                cell_content = cell.content
-                processed_words = []
-                words = cell_content.split()  # Split the cell content into words
-                for word in words:
-                    word_obj = type('', (), {'content': word, 'confidence': 0.8})()  # Assuming 0.8 confidence
-                    processed_word = process_word(word_obj, cell_content, openai_client)
-                    processed_words.append(processed_word)
-
-                processed_cell_content = " ".join(processed_words)
-                table_output += f"Row {cell.row_index + 1}, Column {cell.column_index + 1}: {processed_cell_content}\n"
-                aggregated_text2.append(processed_cell_content + "\n")
-                return " ".join(aggregated_text2)  # Return the combined text as a string
+    return " ".join(processed_words)
 
 def analyze_document_app():
     st.title("Intelligent Document Processing System (IDPS)")
