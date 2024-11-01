@@ -262,7 +262,7 @@ def analyze_layout(file_path, openai_client):
                 return " ".join(aggregated_text2)  # Return the combined text as a string
 
 def analyze_document_app():
-    st.title("Intelligent Document Processing System (IDPS)")
+    st.title("AI Scrawl Wizards")
 
     if 'file_path' not in st.session_state:
         st.session_state['file_path'] = None
