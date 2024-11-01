@@ -87,7 +87,7 @@ def summarize_text(text, openai_client):
             },
         ],
         temperature=0.5,
-        max_tokens=150,
+        max_tokens=100,
     )
 
     summary = response.choices[0].message.content.strip()
@@ -195,7 +195,7 @@ def analyze_layout(file_path, openai_client):
             },
         ],
         temperature=0.5,
-        max_tokens=2000,
+        max_tokens=100,
     )
 
     if response and hasattr(response, "choices") and response.choices:
