@@ -3,6 +3,9 @@
 ##########################################################################################################################################################################################################################
 ##########################################################################################################################################################################################################################
 
+
+Our project is the result of a true team effort, with each member bringing unique strengths to the Hackathon: Executive Challenge. Together, we navigated complex research and problem-solving, and every person’s input was essential to our success. Without the dedication and collaboration of each teammate, our findings and overall achievements wouldn’t have been possible.
+
 1) Dmytro Zelinskyi
 
 With a background in higher technical education and over 20 years of experience in software development, 
