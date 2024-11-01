@@ -79,7 +79,7 @@ def summarize_text(text, openai_client):
     prompt = f"Please summarize the following text:\n\n{text}\n\nSummary:"
 
     response = openai_client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4",
         messages=[
             {
                 "role": "user",
@@ -147,7 +147,7 @@ def process_word(word, context, openai_client, file_path=None):
         try:
             # Make the API call
             response = openai_client.chat.completions.create(
-                model="gpt-4o",  # Replace with your Azure OpenAI model deployment name
+                model="gpt-4",  # Replace with your Azure OpenAI model deployment name
                 messages=messages,
                 temperature=0.45,
                 max_tokens=100
@@ -183,7 +183,7 @@ def analyze_layout(file_path, openai_client):
 
     # Convert image bytes to text using GPT-4o
     response = openai_client.chat.completions.create(
-        model="gpt-4o",
+        model="gpt-4",
         messages=[
             {
                 "role": "system",
